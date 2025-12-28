@@ -1,0 +1,22 @@
+import { Outlet, ScrollRestoration } from "react-router-dom";
+import Navbar from "../components/layout/Navbar";
+import AnimatedBackdrop from "../components/ui/AnimatedBackdrop";
+import ThemeSettings from "../components/ui/ThemeSettings";
+import ScrollToTop from "../components/ui/ScrollToTop";
+import Footer from "../components/layout/Footer";
+
+export default function App() {
+  return (
+    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50">
+      <AnimatedBackdrop  intensity="high" />
+      <Navbar />
+      <main className="pt-16">
+        <Outlet />
+      </main>
+      <Footer />
+      <ThemeSettings />
+      <ScrollToTop />
+      <ScrollRestoration />
+    </div>
+  );
+}
