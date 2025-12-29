@@ -5,11 +5,13 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
+import { useSkills } from "../../../app/api/resources";
 
 type SkillItem = {
   title: string;
   percent: number;
   subtitle?: string;
+  paletteIndex?: number;
 };
 
 
@@ -182,62 +184,72 @@ function Bar({ item, delay }: { item: SkillItem; delay: number }) {
 export default function SkillsShowcase() {
   const { t } = useTranslation();
 
+  const { data: apiSkills } = useSkills();
+
   const groups = useMemo(() => {
-    const mk = (items: Omit<SkillItem, "color">[], seed: number) =>
-      items.map((it, idx) => ({ ...it, color: COLORS[(seed + idx) % COLORS.length] }));
+    // fallback (in case API is empty)
+    const fallback: SkillItem[] = [
+      { title: t("skills.backend.s1t"), percent: 95, subtitle: t("skills.backend.s1d") },
+      { title: t("skills.frontend.s1t"), percent: 85, subtitle: t("skills.frontend.s1d") },
+      { title: t("skills.systems.s1t"), percent: 90, subtitle: t("skills.systems.s1d") },
+      { title: t("skills.backend.s2t"), percent: 92, subtitle: t("skills.backend.s2d") },
+      { title: t("skills.frontend.s2t"), percent: 80, subtitle: t("skills.frontend.s2d") },
+      { title: t("skills.systems.s2t"), percent: 88, subtitle: t("skills.systems.s2d") },
+      { title: t("skills.backend.s3t"), percent: 90, subtitle: t("skills.backend.s3d") },
+      { title: t("skills.frontend.s3t"), percent: 88, subtitle: t("skills.frontend.s3d") },
+      { title: t("skills.systems.s3t"), percent: 87, subtitle: t("skills.systems.s3d") },
+      { title: t("skills.backend.s4t"), percent: 88, subtitle: t("skills.backend.s4d") },
+      { title: t("skills.frontend.s4t"), percent: 90, subtitle: t("skills.frontend.s4d") },
+      { title: t("skills.systems.s4t"), percent: 86, subtitle: t("skills.systems.s4d") },
+    ];
 
-    return {
-      systems: mk(
-        [
-          { title: t("skills.systems.s1t"), percent: 90, subtitle: t("skills.systems.s1d") , paletteIndex: 0 },
-          { title: t("skills.systems.s2t"), percent: 88, subtitle: t("skills.systems.s2d") , paletteIndex: 1 },
-          { title: t("skills.systems.s3t"), percent: 87, subtitle: t("skills.systems.s3d") , paletteIndex: 2 },
-          { title: t("skills.systems.s4t"), percent: 86, subtitle: t("skills.systems.s4d") , paletteIndex: 3 },
-        ],
-        6
-      ),
-      frontend: mk(
-        [
-          { title: t("skills.frontend.s1t"), percent: 85, subtitle: t("skills.frontend.s1d") , paletteIndex: 4 },
-          { title: t("skills.frontend.s2t"), percent: 80, subtitle: t("skills.frontend.s2d") , paletteIndex: 5 },
-          { title: t("skills.frontend.s3t"), percent: 88, subtitle: t("skills.frontend.s3d") , paletteIndex: 6 },
-          { title: t("skills.frontend.s4t"), percent: 90, subtitle: t("skills.frontend.s4d") , paletteIndex: 7 },
-        ],
-        3
-      ),
-      backend: mk(
-        [
-          { title: t("skills.backend.s1t"), percent: 95, subtitle: t("skills.backend.s1d") , paletteIndex: 8 },
-          { title: t("skills.backend.s2t"), percent: 92, subtitle: t("skills.backend.s2d") , paletteIndex: 0 },
-          { title: t("skills.backend.s3t"), percent: 90, subtitle: t("skills.backend.s3d") , paletteIndex: 1 },
-          { title: t("skills.backend.s4t"), percent: 88, subtitle: t("skills.backend.s4d") , paletteIndex: 2 },
-        ],
-        0
-      ),
-    };
-  }, [t]);
+    const base: SkillItem[] = (apiSkills?.length ? apiSkills : fallback).map((s, idx) => ({
+      title: s.title,
+      subtitle: s.subtitle,
+      percent: s.percent,
+      paletteIndex: idx % SKILL_PALETTE.length,
+    }));
 
-  const chips = useMemo(
-    () => [
-      "Spatie i18n",
-      "Meta API",
-      "OPay",
-      "Payments",
-      "Webhooks",
-      "Queues",
-      "Redis",
-      "MySQL",
-      "Tailwind",
-      "TypeScript",
-      "React",
-      "Livewire",
-      "Laravel",
-      "IIS / Nginx",
-      "Docker (Basics)",
-      "Audit Logs",
-    ],
-    []
-  );
+    const col1: SkillItem[] = [];
+    const col2: SkillItem[] = [];
+    const col3: SkillItem[] = [];
+
+    base.forEach((it, idx) => {
+      if (idx % 3 === 0) col1.push(it);
+      else if (idx % 3 === 1) col2.push(it);
+      else col3.push(it);
+    });
+
+    return { col1, col2, col3 };
+  }, [t, apiSkills]);
+
+  const chips = useMemo(() => {
+    const fromApi = (apiSkills || [])
+      .map((s) => s.title)
+      .filter((x) => !!x && String(x).trim() !== "")
+      .slice(0, 20);
+
+    return fromApi.length
+      ? fromApi
+      : [
+          "Spatie i18n",
+          "Meta API",
+          "OPay",
+          "Payments",
+          "Webhooks",
+          "Queues",
+          "Redis",
+          "MySQL",
+          "Tailwind",
+          "TypeScript",
+          "React",
+          "Livewire",
+          "Laravel",
+          "IIS / Nginx",
+          "Docker (Basics)",
+          "Audit Logs",
+        ];
+  }, [apiSkills]);
 
   return (
     <section className="relative py-14">
@@ -246,20 +258,20 @@ export default function SkillsShowcase() {
 
         <div className="mt-8 grid gap-5 lg:grid-cols-3">
           <div className="space-y-4">
-            {groups.systems.map((it, idx) => (
-              <Bar key={it.title} item={it} delay={0.05 * idx} />
+            {groups.col1.map((it, idx) => (
+              <Bar key={`${it.title}-${idx}`} item={it} delay={0.05 * idx} />
             ))}
           </div>
 
           <div className="space-y-4">
-            {groups.frontend.map((it, idx) => (
-              <Bar key={it.title} item={it} delay={0.05 * idx} />
+            {groups.col2.map((it, idx) => (
+              <Bar key={`${it.title}-${idx}`} item={it} delay={0.05 * idx} />
             ))}
           </div>
 
           <div className="space-y-4">
-            {groups.backend.map((it, idx) => (
-              <Bar key={it.title} item={it} delay={0.05 * idx} />
+            {groups.col3.map((it, idx) => (
+              <Bar key={`${it.title}-${idx}`} item={it} delay={0.05 * idx} />
             ))}
           </div>
         </div>

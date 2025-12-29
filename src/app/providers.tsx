@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next";
 import { applyDirection } from "../utils/direction";
 import { storage } from "../utils/storage";
 import { BRAND_STORAGE_KEY, DEFAULT_BRAND, type BrandTheme } from "../theme/theme";
+import { ApiLoadingProvider } from "./api/loading";
+import { SettingsProvider } from "./settings/context";
+import { clearApiCache } from "./api/hooks";
 
 type Theme = "light" | "dark";
 
@@ -75,6 +78,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     applyDirection(i18n.language);
   }, [i18n.language]);
 
+  // Re-fetch API data on language switch (because API is localized by Accept-Language)
+  React.useEffect(() => {
+    clearApiCache();
+  }, [i18n.language]);
+
   React.useEffect(() => {
     applyBrandVars(brand);
     storage.set(BRAND_STORAGE_KEY, brand);
@@ -99,7 +107,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         resetBrand,
       }}
     >
-      {children}
+      <ApiLoadingProvider>
+        <SettingsProvider>{children}</SettingsProvider>
+      </ApiLoadingProvider>
     </AppContext.Provider>
   );
 }

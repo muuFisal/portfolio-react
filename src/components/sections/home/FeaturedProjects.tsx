@@ -4,14 +4,15 @@ import SectionHeader from "../../ui/SectionHeader";
 import Badge from "../../ui/Badge";
 import Button from "../../ui/Button";
 import MotionSection from "../../ui/MotionSection";
-import { projects } from "../../../data/projects";
+import { useProjects } from "../../../app/api/resources";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function FeaturedProjects() {
   const { t } = useTranslation();
-  const featured = projects.filter((p) => p.featured).slice(0, 3);
+  const { data, loading } = useProjects();
+  const featured = (data || []).filter((p) => !!p.featured).slice(0, 3);
 
   return (
     <MotionSection className="py-14">
@@ -22,7 +23,18 @@ export default function FeaturedProjects() {
         />
 
         <div className="grid gap-5 md:grid-cols-3">
-          {featured.map((p) => (
+          {loading
+            ? Array.from({ length: 3 }).map((_, idx) => (
+                <Card key={idx} className="overflow-hidden p-0">
+                  <div className="h-40 w-full animate-pulse bg-slate-200 dark:bg-slate-800" />
+                  <div className="p-5">
+                    <div className="h-5 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                    <div className="mt-3 h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                    <div className="mt-2 h-4 w-5/6 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                  </div>
+                </Card>
+              ))
+            : featured.map((p) => (
             <motion.div
               key={p.id}
               initial={{ opacity: 0, y: 12 }}
@@ -33,25 +45,27 @@ export default function FeaturedProjects() {
               <Card className="group overflow-hidden p-0">
                 <div className="relative">
                   <img
-                    src={p.image || "/projects/ecommerce-react.svg"}
-                    alt={t(p.titleKey)}
+                    src={p.cover_image_url || "/projects/ecommerce-react.svg"}
+                    alt={p.title}
                     className="h-40 w-full object-cover"
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent opacity-0 transition group-hover:opacity-100" />
-                  <div className="absolute start-3 top-3">
-                    <Badge>{p.category}</Badge>
-                  </div>
+                  {p.tags?.length ? (
+                    <div className="absolute start-3 top-3">
+                      <Badge>{p.tags[0]}</Badge>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="p-5">
-                  <div className="text-lg font-extrabold">{t(p.titleKey)}</div>
+                  <div className="text-lg font-extrabold">{p.title}</div>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 line-clamp-3">
-                    {t(p.descKey)}
+                    {p.summary || ""}
                   </p>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {p.stack.slice(0, 4).map((s) => (
+                    {(p.stack || []).slice(0, 4).map((s) => (
                       <span
                         key={s}
                         className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"

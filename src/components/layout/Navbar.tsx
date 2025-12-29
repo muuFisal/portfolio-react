@@ -4,6 +4,7 @@ import ThemeToggle from "../ui/ThemeToggle";
 import LangToggle from "../ui/LangToggle";
 import { useTranslation } from "react-i18next";
 import SocialIcons from "../ui/SocialIcons";
+import { useSettings } from "../../app/settings/context";
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   `rounded-xl px-3 py-2 text-sm font-semibold transition ${
@@ -14,13 +15,16 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export default function Navbar() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
+
+  const brand = settings?.site_name || "Mohamed Fisal";
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/70">
       <Container>
         <div className="flex h-16 items-center justify-between gap-3">
           <NavLink to="/" className="font-extrabold tracking-tight">
-            <span className="text-slate-900 dark:text-white">Mohamed Fisal</span>
+            <span className="text-slate-900 dark:text-white">{brand}</span>
             <span className="text-slate-500 dark:text-slate-300">.Portfolio</span>
           </NavLink>
 

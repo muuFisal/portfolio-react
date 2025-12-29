@@ -7,7 +7,9 @@
   },
   "common": {
     "close": "Close",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again"
   },
   "footer": {
     "tagline": "Building scalable systems, clean architecture, and reliable integrations.",
@@ -206,6 +208,7 @@
   "events": {
     "title": "Events & Milestones",
     "subtitle": "Releases, launches, and major delivery moments.",
+    "open": "Open",
     "items": {
       "e1": {
         "title": "ERP Manufacturing modules delivery",
@@ -234,12 +237,17 @@
     "form": {
       "name": "Name",
       "email": "Email",
+      "phone": "Phone",
+      "subject": "Subject",
       "message": "Message",
       "namePh": "Your name",
       "emailPh": "Your email",
+      "phonePh": "Optional",
+      "subjectPh": "Optional",
       "msgPh": "Tell me what you want to build...",
       "send": "Send message",
-      "note": "This is a UI-only form. You can connect it to an API, EmailJS, or your backend later."
+      "sent": "Message sent successfully. I’ll get back to you soon.",
+      "note": "By sending this message, you agree that I can contact you back using the provided details."
     }
   },
   "testimonials": {
