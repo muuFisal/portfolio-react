@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import type { Experience } from "../../../app/api/resources";
 
-function fmtRange(start?: string, end?: string, current?: boolean) {
+function fmtRange(start?: string | null, end?: string | null, current?: boolean) {
   const s = start ? String(start).slice(0, 10) : "";
   const e = current ? "Present" : end ? String(end).slice(0, 10) : "";
   return [s, e].filter(Boolean).join(" • ");

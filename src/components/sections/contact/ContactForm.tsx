@@ -3,8 +3,6 @@ import Card from "../../ui/Card";
 import Button from "../../ui/Button";
 import MotionSection from "../../ui/MotionSection";
 import { useTranslation } from "react-i18next";
-import { apiRequest } from "../../../app/api/client";
-import { useApiLoading } from "../../../app/api/loading";
 
 type FormState = {
   name: string;
@@ -16,7 +14,6 @@ type FormState = {
 
 export default function ContactForm() {
   const { t } = useTranslation();
-  const { start, stop } = useApiLoading();
   const [form, setForm] = React.useState<FormState>({
     name: "",
     email: "",
@@ -38,31 +35,18 @@ export default function ContactForm() {
     setStatus("idle");
     setErrMsg("");
     setLoading(true);
-    start();
 
     try {
-      const fd = new FormData();
-      fd.append("name", form.name);
-      fd.append("email", form.email);
-      fd.append("phone", form.phone);
-      fd.append("subject", form.subject);
-      fd.append("message", form.message);
-      fd.append("source", "portfolio_web");
-
-      await apiRequest("/contact", {
-        method: "POST",
-        body: fd,
-          email: form.email,
-          });
+      // Mock API call since this is now a static site
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setStatus("ok");
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (err: any) {
       setStatus("err");
-      setErrMsg(err?.message || t("common.error"));
+      setErrMsg(t("common.error"));
     } finally {
       setLoading(false);
-      stop();
     }
   };
 

@@ -1,0 +1,396 @@
+{
+  "nav": {
+    "about": "About",
+    "cv": "Download CV",
+    "projects": "Projects",
+    "experience": "Experience",
+    "events": "Events",
+    "contact": "Contact"
+  },
+  "common": {
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again"
+  },
+  "footer": {
+    "quick": "Quick Links",
+    "cv": "Download CV",
+    "tagline": "Building scalable systems, clean architecture, and reliable integrations.",
+    "rights": "All rights reserved."
+  },
+  "about": {
+    "badge": "About Me",
+    "title": "A senior engineer focused on scalable products and reliable delivery.",
+    "extra": "My work spans ERP, CRM, manufacturing, e-commerce, and fintech products. I enjoy turning complex workflows into maintainable systems with clear architecture, secure integrations, and practical user experiences.",
+    "downloadCv": "Download CV",
+    "metrics": {
+      "years": "Years of experience",
+      "stack": "Main delivery stack",
+      "domain": "Domain depth"
+    },
+    "profile": {
+      "fullName": "Mohamed Fisal",
+      "headline": "Senior Backend Engineer • Laravel Architect • React Developer",
+      "location": "Egypt • Remote-friendly",
+      "focus1": "ERP / CRM Architecture",
+      "focus2": "Laravel + Livewire Systems",
+      "focus3": "React + TypeScript Frontends",
+      "focus4": "Payments, Wallets & Webhooks"
+    },
+    "v1": {
+      "title": "Architecture that survives growth",
+      "desc": "I care about structure, separation of concerns, maintainability, and clean scaling paths from day one."
+    },
+    "v2": {
+      "title": "Business-first execution",
+      "desc": "I translate requirements into systems that teams can actually operate, extend, and trust in production."
+    },
+    "v3": {
+      "title": "Frontend awareness",
+      "desc": "Even as a backend-first engineer, I build polished interfaces with React when the product needs a stronger user experience."
+    },
+    "v4": {
+      "title": "Production reliability",
+      "desc": "Payments, wallets, webhooks, queues, permissions, logs, and edge cases are all part of the job — not after thoughts."
+    }
+  },
+  "home": {
+    "process": {
+      "title": "How I work",
+      "subtitle": "A practical approach focused on shipping business-ready systems, not just screens.",
+      "s1t": "Discovery & domain mapping",
+      "s1d": "I start from product logic, business constraints, and data flow before touching implementation.",
+      "s2t": "Architecture & implementation",
+      "s2d": "I design modules, APIs, permissions, and edge cases with maintainability and scalability in mind.",
+      "s3t": "Production hardening",
+      "s3d": "I care about logs, validation, idempotency, retries, UX polish, and clean handoff for the team."
+    },
+    "opensource": {
+      "badge": "Open Source",
+      "desc": "A reusable Laravel package for OTP generation and verification with multiple Laravel versions support, cleaner integration, and safer limits handling.",
+      "packagist": "View on Packagist",
+      "github": "GitHub Profile",
+      "i1t": "Laravel 9–12",
+      "i1d": "Wide compatibility for modern apps",
+      "i2t": "Attempts limiting",
+      "i2d": "Safer OTP workflows with abuse control",
+      "i3t": "Drop-in integration",
+      "i3d": "Easy adoption across auth and recovery flows",
+      "i4t": "Production mindset",
+      "i4d": "Built from real project needs, not demos"
+    },
+    "hero": {
+      "badge": "Senior Backend Engineer / Architect",
+      "headline": "Architecting systems that scale gracefully.",
+      "subtitle": "I build production-grade platforms with Laravel and React. From massive ERPs to sensitive payment gateways, I focus on reliability, clean code, and fast execution.",
+      "ctaProjects": "My Best Work",
+      "ctaContact": "Let's Talk",
+      "stats": {
+        "projectsVal": "30+",
+        "projects": "Systems Built",
+        "deliveryVal": "100%",
+        "delivery": "Delivery Rate",
+        "langsVal": "AR/EN",
+        "langs": "Native i18n"
+      }
+    },
+    "trust": {
+      "exp": "7+ Years Experience",
+      "expDesc": "Delivering robust systems",
+      "domain": "ERP / CRM / Payments",
+      "domainDesc": "Complex domain architecture",
+      "remote": "Available for Consulting",
+      "remoteDesc": "Remote delivery worldwide"
+    },
+    "expertise": {
+      "e1": "ERP & CRM Systems",
+      "e2": "Payment Gateways",
+      "e3": "Wallet Architecture",
+      "e4": "Multilingual Dashboards",
+      "e5": "React Frontends",
+      "e6": "Webhook Automation",
+      "e7": "Performance & DX",
+      "e8": "Clean Laravel Architecture"
+    },
+    "highlights": {
+      "title": "Why I’m a strong fit",
+      "subtitle": "What I focus on when building production systems.",
+      "i1t": "Scalable architecture",
+      "i1d": "Modular design, clear boundaries, and maintainability.",
+      "i2t": "Payments & webhooks",
+      "i2d": "Signature validation, callbacks, retries, and idempotency.",
+      "i3t": "Arabic/English + RTL",
+      "i3d": "Localization-ready UI and clean translation strategy.",
+      "i4t": "Delivery mindset",
+      "i4d": "Fast execution with quality and business impact."
+    },
+    "featured": {
+      "title": "Featured work",
+      "subtitle": "A few projects that show architecture + reliability.",
+      "cta": "See all",
+      "view": "Open projects"
+    },
+    "skills": {
+      "title": "Skills that ship",
+      "subtitle": "A practical skillset built from real projects.",
+      "toolsTitle": "Tools & Ecosystem",
+      "toolsSubtitle": "Tech I frequently use to deliver reliable solutions."
+    },
+    "testimonials": {
+      "title": "What people say",
+      "subtitle": "Short feedback that reflects collaboration and quality."
+    },
+    "cta": {
+      "title": "Need a developer who can deliver?",
+      "subtitle": "Let’s talk about your product, timeline, and priorities — and ship something real.",
+      "projects": "Browse Projects",
+      "contact": "Contact"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "A curated selection of work that demonstrates architecture, reliability, and business value.",
+    "search": "Search projects...",
+    "viewDetails": "View details",
+    "stack": "Tech stack",
+    "highlights": "Highlights",
+    "filters": {
+      "all": "All",
+      "erp": "ERP",
+      "crm": "CRM",
+      "fintech": "FinTech",
+      "edtech": "EdTech",
+      "ecommerce": "Ecommerce",
+      "search": "Search projects..."
+    },
+    "items": {
+      "afz": {
+        "title": "AFZ Manufacturing ERP",
+        "desc": "A modular manufacturing system: sizes, categories/sets, pattern cards, colorways, audit logs, and multilingual admin.",
+        "h1": "Translatable fields (AR/EN) across modules",
+        "h2": "Advanced Livewire CRUD with soft deletes + logs",
+        "h3": "Domain-driven structure for manufacturing workflows"
+      },
+      "crm": {
+        "title": "CRM + Meta Lead Ads Pipeline",
+        "desc": "Leads ingestion from Meta webhooks, round-robin assignment, kanban stages, and notifications.",
+        "h1": "Secure webhook verify + ingestion with dedupe",
+        "h2": "Sales permissions and own-leads visibility rules",
+        "h3": "Kanban pipeline with stage transitions"
+      },
+      "mecarde": {
+        "title": "Mecarde Wallet + Providers",
+        "desc": "Wallet top-ups via OPay + voucher providers, order flows with tracking, and exports for bulk codes.",
+        "h1": "Webhook signature verification + stable callbacks",
+        "h2": "Wallet transactions, holds, refunds & audit trails",
+        "h3": "Bulk voucher delivery export (Excel/CSV)"
+      },
+      "deana": {
+        "title": "Deana EdTech — Time Wallet Sessions",
+        "desc": "Meet sessions powered by minutes wallet: free daily minutes + paid minutes with consumption tracking.",
+        "h1": "Accurate consumption + leftover reuse",
+        "h2": "Teacher/student endpoints with filters & pagination",
+        "h3": "Clean API resources and statuses"
+      },
+      "ecom": {
+        "title": "React Ecommerce (AR/EN + Theme)",
+        "desc": "Modern storefront demo with i18n, RTL, dynamic theming, and structured pages.",
+        "h1": "Multi-language + RTL layout support",
+        "h2": "Dark/light mode with clean UI system",
+        "h3": "Reusable components and modern structure"
+      }
+    },
+    "featured": "Featured",
+    "view": "View details",
+    "tap": "Tap to view details",
+    "back": "Back to projects",
+    "links": "Project links",
+    "private": "This project can be showcased privately or on request.",
+    "consulting": "Need something similar?",
+    "consultingDesc": "I build custom systems with strong backend architecture, polished dashboards, and reliable integrations.",
+    "contact": "Let’s talk",
+    "live": "Live",
+    "googlePlay": "Google Play",
+    "appStore": "App Store"
+  },
+  "skills": {
+    "backend": {
+      "s1t": "Backend",
+      "s1d": "PHP / Laravel",
+      "s2t": "Integrations",
+      "s2d": "REST APIs / Webhooks",
+      "s3t": "Dashboards",
+      "s3d": "Livewire dynamic CRUD",
+      "s4t": "Security",
+      "s4d": "Auth, tokens & permissions"
+    },
+    "frontend": {
+      "s1t": "Frontend",
+      "s1d": "React + TypeScript",
+      "s2t": "UX",
+      "s2d": "Inertia fast flows",
+      "s3t": "UI",
+      "s3d": "Tailwind / Bootstrap",
+      "s4t": "Locales",
+      "s4d": "i18n + RTL"
+    },
+    "systems": {
+      "s1t": "Systems",
+      "s1d": "Wallet Systems",
+      "s2t": "Payments",
+      "s2d": "Payment Gateways",
+      "s3t": "Architecture",
+      "s3d": "ERP / CRM Architecture",
+      "s4t": "Observability",
+      "s4d": "Audit Logs"
+    },
+    "title": "Skills that ship to production",
+    "subtitle": "Hands-on experience built on real projects — with focus on performance, security, and DX.",
+    "tools": {
+      "title": "Tools & stack",
+      "subtitle": "Tech I use to ship stable solutions.",
+      "hint": "Scale-ready"
+    }
+  },
+  "experience": {
+    "title": "Experience",
+    "subtitle": "Highlights of responsibilities, systems built, and measurable outcomes.",
+    "timeline": {
+      "i1t": "ERP / Manufacturing Systems",
+      "i1d": "Built complex modules with translations, logs, and advanced Livewire UIs.",
+      "i1tag": "Architecture + Domain Modeling",
+      "i2t": "Payments + Wallet Systems",
+      "i2d": "Implemented stable payment flows with callbacks, signatures, and transaction trails.",
+      "i2tag": "Reliability + Security",
+      "i3t": "CRM + Lead Pipelines",
+      "i3d": "Automated lead ingestion and routing with permissions and notifications.",
+      "i3tag": "Automation + Productivity"
+    },
+    "matrix": {
+      "title": "How I add value",
+      "subtitle": "What I deliver beyond “writing code”.",
+      "arch": "Architecture & Quality",
+      "arch1": "Clear module boundaries, reusable patterns, and readable code.",
+      "arch2": "Data integrity with transactions, constraints, and safe defaults.",
+      "arch3": "Logs/audit trails and clean permission layers.",
+      "pay": "Payments & Integrations",
+      "pay1": "Webhook verification, retries, idempotency, and state machines.",
+      "pay2": "Wallet holds/refunds and consistent ledger-like transactions.",
+      "pay3": "Third-party APIs with clean drivers/factories.",
+      "ops": "Delivery & Operations",
+      "ops1": "Ship fast without sacrificing code quality.",
+      "ops2": "Debugging, edge cases, and production hardening.",
+      "ops3": "Localization (AR/EN), RTL, and UI consistency.",
+      "tagQuality": "Quality",
+      "tagScale": "Scale",
+      "tagSecurity": "Security"
+    },
+    "roles": {
+      "sr": {
+        "title": "Senior Backend Engineer",
+        "location": "Remote",
+        "desc": "Architected and delivered scalable ERP systems, Wallet payment gateways, and multilingual platforms. Specialized in Laravel, React, and seamless third-party integrations."
+      },
+      "mid": {
+        "title": "Full-Stack Developer",
+        "desc": "Developed RESTful APIs, modern dynamic user interfaces, and custom dashboards ensuring robust data pipelines and fast deployment."
+      }
+    }
+  },
+  "events": {
+    "title": "Events & Milestones",
+    "subtitle": "Releases, launches, and major delivery moments.",
+    "open": "Open",
+    "items": {
+      "e1": {
+        "title": "ERP Manufacturing modules delivery",
+        "desc": "Completed core manufacturing modules with translations, logs, and advanced data tables."
+      },
+      "e2": {
+        "title": "Wallet payments + OPay integration",
+        "desc": "Delivered end-to-end topup flow with webhook validation and unified callback view."
+      },
+      "e3": {
+        "title": "Market tickers engine shipped",
+        "desc": "Built live-ish market tickers with fallback logic and ensureFresh updates."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Let’s build something great. Tell me about your project and timeline.",
+    "cards": {
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "hint": "Update these links with your real profiles."
+    },
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "subject": "Subject",
+      "message": "Message",
+      "namePh": "Your name",
+      "emailPh": "Your email",
+      "phonePh": "Optional",
+      "subjectPh": "Optional",
+      "msgPh": "Tell me what you want to build...",
+      "send": "Send message",
+      "sent": "Message sent successfully. I’ll get back to you soon.",
+      "note": "By sending this message, you agree that I can contact you back using the provided details."
+    }
+  },
+  "testimonials": {
+    "items": {
+      "t1": {
+        "name": "Project Manager",
+        "role": "Client",
+        "quote": "Delivers fast with strong architecture and clean code."
+      },
+      "t2": {
+        "name": "Team Lead",
+        "role": "Tech",
+        "quote": "Great at integrations, webhooks, and edge cases."
+      },
+      "t3": {
+        "name": "Founder",
+        "role": "Startup",
+        "quote": "Reliable execution, clear communication, and real business impact."
+      }
+    }
+  },
+  "cta": {
+    "title": "Need a scalable product?",
+    "subtitle": "Let’s align on goals, set priorities, and ship a clear result — without over-engineering.",
+    "primary": "Contact Me",
+    "secondary": "Browse projects",
+    "q1": {
+      "title": "Scalable Systems",
+      "text": "Need a system that scales with your business without breaking?"
+    },
+    "q2": {
+      "title": "Custom Workflows",
+      "text": "Want custom solutions that fit your workflow — not generic templates?"
+    },
+    "q3": {
+      "title": "Reliable Payments",
+      "text": "Need reliable payments, wallet flows, and webhooks with clean callbacks?"
+    },
+    "q4": {
+      "title": "Clear Visibility",
+      "text": "Looking for a fast dashboard with clear data, logs, and reports?"
+    }
+  },
+  "themeSettings": {
+    "title": "Theme settings",
+    "primary": "Primary color",
+    "secondary": "Secondary color",
+    "font": "Font",
+    "reset": "Reset",
+    "done": "Done",
+    "tip": "Tip: these settings are saved in your browser (localStorage). You can add more options later (radius, density, animations…)."
+  }
+}

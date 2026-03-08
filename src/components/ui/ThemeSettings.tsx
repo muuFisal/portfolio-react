@@ -156,14 +156,14 @@ export default function ThemeSettings() {
                     onClick={resetBrand}
                     className="w-full rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-sm font-extrabold text-slate-900 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/30 dark:text-white dark:hover:bg-slate-900/60"
                   >
-                    Reset
+                    {t("themeSettings.reset", "Reset")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
                     className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-extrabold text-white shadow-soft hover:brightness-110"
                   >
-                    Done
+                    {t("themeSettings.done", "Done")}
                   </button>
                 </div>
 

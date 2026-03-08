@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import MotionSection from "../../ui/MotionSection";
+import { useSettings } from "../../../app/settings/context";
+import { getProfileData } from "../../../utils/profile";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -13,215 +15,124 @@ const fadeUp = {
 
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
+  show: { transition: { staggerChildren: 0.1 } },
 };
 
 export default function Hero() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
+  const profile = getProfileData(settings);
 
   return (
-    <MotionSection className="relative overflow-hidden py-16 sm:py-20">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 opacity-40">
-          <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-slate-200 blur-3xl dark:bg-slate-800" />
-          <div className="absolute -right-24 top-36 h-72 w-72 rounded-full bg-slate-200 blur-3xl dark:bg-slate-800" />
-          <div className="absolute left-1/2 top-[-120px] h-72 w-72 -translate-x-1/2 rounded-full bg-slate-200 blur-3xl dark:bg-slate-800" />
-        </div>
-
-        {/* subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.10] dark:opacity-[0.12]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(148,163,184,0.35) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.35) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-            maskImage:
-              "radial-gradient(ellipse at center, black 55%, transparent 75%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 55%, transparent 75%)",
-          }}
-        />
+    <MotionSection className="relative overflow-hidden py-12 sm:py-16 lg:py-20 bg-slate-50 dark:bg-[#0a0f1c]">
+      {/* Premium Background Effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -left-32 top-10 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px] opacity-70" />
+        <div className="absolute -right-32 bottom-10 h-[400px] w-[400px] rounded-full bg-secondary/10 blur-[100px] opacity-60" />
       </div>
 
-      <Container>
-        <div className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
-          {/* Left / Main copy */}
-          <motion.div variants={stagger} initial="hidden" animate="show">
+      <Container className="relative z-10">
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+
+          {/* Left Side: Main Content */}
+          <motion.div variants={stagger} initial="hidden" animate="show" className="text-center lg:text-start order-2 lg:order-1">
             <motion.div variants={fadeUp}>
-              <Badge>{t("home.hero.badge")}</Badge>
+              <Badge className="px-4 py-1.5 text-xs font-bold tracking-wide bg-primary/10 text-primary border-primary/20 dark:bg-primary/20 dark:border-primary/30">
+                {t("home.hero.badge", "Senior Backend Engineer / Architect")}
+              </Badge>
             </motion.div>
 
-            <motion.h1
-              variants={fadeUp}
-              className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl"
-            >
-              <span className="relative inline-block">
-                {t("home.hero.title")}
-                <span className="absolute -bottom-2 start-0 h-1 w-24 rounded-full bg-slate-900/70 dark:bg-white/70" />
-              </span>
+            <motion.h1 variants={fadeUp} className="mt-5 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white leading-[1.1]">
+              {t("home.hero.headline", "Architecting systems that scale gracefully.")}
             </motion.h1>
 
-            <motion.p
-              variants={fadeUp}
-              className="mt-5 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-300"
-            >
-              {t("home.hero.desc")}
+            <motion.p variants={fadeUp} className="mt-5 text-base sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0">
+              {t("home.hero.subtitle", "I build production-grade platforms with Laravel and React. From massive ERPs to sensitive payment gateways, I focus on reliability, clean code, and fast execution.")}
             </motion.p>
 
-            <motion.div variants={fadeUp} className="mt-7 flex flex-wrap gap-3">
+            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap justify-center lg:justify-start gap-3">
               <Link to="/projects">
-                <Button className="px-5 py-2.5">{t("home.hero.ctaProjects")}</Button>
+                <Button className="px-7 py-3 rounded-xl shadow-lg shadow-primary/20 transition-transform hover:-translate-y-0.5 font-bold">
+                  {t("home.hero.ctaProjects", "My Best Work")}
+                </Button>
               </Link>
               <Link to="/contact">
-                <Button variant="secondary" className="px-5 py-2.5">
-                  {t("home.hero.ctaContact")}
+                <Button variant="secondary" className="px-7 py-3 rounded-xl border border-slate-200 dark:border-slate-800 transition-transform hover:-translate-y-0.5 bg-white dark:bg-slate-950/50 font-bold">
+                  {t("home.hero.ctaContact", "Let's Talk")}
                 </Button>
               </Link>
             </motion.div>
 
-            <motion.div
-              variants={fadeUp}
-              className="mt-8 grid grid-cols-3 gap-3"
-            >
-              <Stat k={t("home.hero.stats.s1k")} v={t("home.hero.stats.s1v")} />
-              <Stat k={t("home.hero.stats.s2k")} v={t("home.hero.stats.s2v")} />
-              <Stat k={t("home.hero.stats.s3k")} v={t("home.hero.stats.s3v")} />
+            <motion.div variants={fadeUp} className="mt-10 flex flex-wrap justify-center lg:justify-start items-center gap-6 border-t border-slate-200/60 dark:border-slate-800/60 pt-6">
+              <div className="flex flex-col">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{t("home.hero.stats.projectsVal", "30+")}</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{t("home.hero.stats.projects", "Systems Built")}</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{t("home.hero.stats.deliveryVal", "100%")}</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{t("home.hero.stats.delivery", "Delivery Rate")}</span>
+              </div>
+              <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-black text-slate-900 dark:text-white">{t("home.hero.stats.langsVal", "AR/EN")}</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{t("home.hero.stats.langs", "Native i18n")}</span>
+              </div>
             </motion.div>
           </motion.div>
 
-          {/* Right / Proof card */}
+          {/* Right Side: Photo */}
           <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.08 }}
-            className="relative"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="flex justify-center lg:justify-end order-1 lg:order-2"
           >
-            <div className="absolute -inset-2 rounded-[28px] bg-slate-900/10 blur-xl dark:bg-white/10" />
-
-            <div className="relative rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-900/40">
-              <div className="flex items-center justify-between gap-4">
-                <div className="text-sm font-bold text-slate-500 dark:text-slate-300">
-                  {t("home.hero.cardTitle")}
-                </div>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
-                  UI • API • Systems
-                </span>
-              </div>
-
-              <div className="mt-4 grid gap-3">
-                <FloatingLine
-                  delay={0.05}
-                  title={t("home.hero.card.l1t")}
-                  desc={t("home.hero.card.l1d")}
-                  icon="🏗️"
-                />
-                <FloatingLine
-                  delay={0.12}
-                  title={t("home.hero.card.l2t")}
-                  desc={t("home.hero.card.l2d")}
-                  icon="💳"
-                />
-                <FloatingLine
-                  delay={0.18}
-                  title={t("home.hero.card.l3t")}
-                  desc={t("home.hero.card.l3d")}
-                  icon="⚡"
-                />
-              </div>
-
-              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
-                <div className="font-extrabold">{t("home.highlights.title")}</div>
-                <p className="mt-1 text-slate-600 dark:text-slate-300">
-                  {t("home.highlights.subtitle")}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Pill>Laravel</Pill>
-                  <Pill>Livewire</Pill>
-                  <Pill>React</Pill>
-                  <Pill>TypeScript</Pill>
-                  <Pill>Webhooks</Pill>
-                  <Pill>Payments</Pill>
-                  <Pill>i18n</Pill>
-                  <Pill>RTL</Pill>
-                </div>
+            {/* Premium Photo Wrapper */}
+            <div className="relative max-w-[280px] sm:max-w-xs w-full lg:mr-4">
+              <div className="absolute -inset-2 rounded-[2rem] bg-gradient-to-br from-primary/30 to-secondary/30 blur-xl opacity-50 transition-opacity duration-500 hover:opacity-70" />
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] border-2 border-white/20 bg-slate-200 dark:border-slate-800/80 dark:bg-slate-900 shadow-2xl">
+                {profile.photoUrl ? (
+                  <img src={profile.photoUrl} alt={profile.fullName} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-6xl font-black text-slate-300 dark:text-slate-800">
+                    MF
+                  </div>
+                )}
+                {/* Subtle Inner Glow */}
+                <div className="absolute inset-0 rounded-[2rem] shadow-[inset_0_0_20px_rgba(255,255,255,0.1)] pointer-events-none" />
               </div>
             </div>
-
-            {/* small floating dots */}
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute -right-3 top-10 hidden h-3 w-3 rounded-full bg-slate-300 dark:bg-slate-700 sm:block"
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute -left-3 bottom-12 hidden h-2.5 w-2.5 rounded-full bg-slate-300 dark:bg-slate-700 sm:block"
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-            />
           </motion.div>
+
         </div>
+
+        {/* 3 Trust Cards row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-12 lg:mt-16 grid gap-4 grid-cols-1 sm:grid-cols-3"
+        >
+          <TrustCard icon="⚡" title={t("home.trust.exp", "7+ Years Experience")} desc={t("home.trust.expDesc", "Delivering robust systems")} />
+          <TrustCard icon="🏗️" title={t("home.trust.domain", "ERP / CRM / Payments")} desc={t("home.trust.domainDesc", "Complex domain architecture")} />
+          <TrustCard icon="💼" title={t("home.trust.remote", "Available for Consulting")} desc={t("home.trust.remoteDesc", "Remote delivery worldwide")} />
+        </motion.div>
       </Container>
     </MotionSection>
   );
 }
 
-function Stat({ k, v }: { k: string; v: string }) {
+function TrustCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <motion.div
-      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
-      whileHover={{ y: -2 }}
-      transition={{ type: "spring", stiffness: 260, damping: 18 }}
-    >
-      <div className="text-xl font-extrabold">{v}</div>
-      <div className="text-xs font-semibold text-slate-500 dark:text-slate-300">
-        {k}
+    <div className="group flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-start gap-4 rounded-2xl border border-slate-200/60 bg-white/60 p-5 shadow-sm backdrop-blur-md transition-all hover:-translate-y-1 hover:border-slate-300 hover:shadow-md dark:border-slate-800/60 dark:bg-slate-900/40 dark:hover:border-slate-700/80 dark:hover:bg-slate-800/60">
+      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xl dark:bg-slate-800 group-hover:scale-110 transition-transform">
+        {icon}
       </div>
-    </motion.div>
-  );
-}
-
-function FloatingLine({
-  title,
-  desc,
-  icon,
-  delay,
-}: {
-  title: string;
-  desc: string;
-  icon: string;
-  delay: number;
-}) {
-  return (
-    <motion.div
-      className="group rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-950/30"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay }}
-      whileHover={{ y: -3 }}
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-lg dark:bg-slate-900">
-          {icon}
-        </div>
-        <div>
-          <div className="font-extrabold">{title}</div>
-          <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            {desc}
-          </div>
-        </div>
+      <div className="flex-1">
+        <div className="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{title}</div>
+        <div className="text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400 mt-1">{desc}</div>
       </div>
-      <div className="mt-3 h-[2px] w-0 rounded-full bg-slate-900/70 transition-all duration-300 group-hover:w-full dark:bg-white/70" />
-    </motion.div>
-  );
-}
-
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-200">
-      {children}
-    </span>
+    </div>
   );
 }

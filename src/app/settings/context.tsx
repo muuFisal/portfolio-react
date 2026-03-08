@@ -1,5 +1,5 @@
 import React from "react";
-import { useApiQuery, clearApiCache } from "../api/hooks";
+import { useTranslation } from "react-i18next";
 
 export type Settings = {
   site_name?: string;
@@ -21,6 +21,19 @@ export type Settings = {
   youtube?: string;
   tiktok?: string;
   footer_text?: string;
+  address?: string;
+  support?: string;
+  promotion?: string;
+  logo_white?: string;
+  profile_image_url?: string;
+  cv_url?: string;
+  resume_url?: string;
+  headline?: string;
+  short_bio?: string;
+  long_bio?: string;
+  years_experience?: number | string;
+  location?: string;
+  availability?: string;
   nav_links?: {
     label: string;
     url: string;
@@ -35,35 +48,6 @@ type Ctx = {
 
 export const SettingsContext = React.createContext<Ctx | null>(null);
 
-
-function mapSettingsResponse(raw: any): Settings {
-  const item = Array.isArray(raw) ? raw[0] : raw;
-  if (!item) return {};
-  return {
-    site_name: item.name ?? item.site_name ?? "",
-    site_title: item.title ?? item.site_title ?? "",
-    site_desc: item.desc ?? item.description ?? item.site_desc ?? "",
-    meta_keys: item.metaKey ?? item.meta_keys ?? "",
-    meta_desc: item.metaDesc ?? item.meta_desc ?? "",
-    logo_url: item.logo ?? item.logo_url ?? "",
-    favicon_url: item.favicon ?? item.favicon_url ?? "",
-    email: item.email ?? "",
-    phone: item.phone ?? "",
-    whatsapp: item.whatsapp ?? "",
-    facebook: item.facebook ?? "",
-    instagram: item.instagram ?? "",
-    youtube: item.youtube ?? "",
-    tiktok: item.tiktok ?? "",
-    linkedin: item.linkedin ?? "",
-    // backend uses xUrl
-    x: item.xUrl ?? item.x ?? item.twitter ?? "",
-    address: item.address ?? "",
-    support: item.support ?? "",
-    promotion: item.promotion ?? "",
-    footer_text: item.copyright ?? item.footer_text ?? "",
-  };
-}
-
 function applyHeadFromSettings(s: Settings) {
   if (s.site_title) document.title = s.site_title;
 
@@ -74,20 +58,51 @@ function applyHeadFromSettings(s: Settings) {
   if (keywords && s.meta_keys) keywords.setAttribute("content", s.meta_keys);
 
   if (s.favicon_url) {
-    const existing = document.querySelector('link[rel="icon"]') as HTMLLinkElement | null;
+    const existing = document.querySelector(
+      'link[rel="icon"]'
+    ) as HTMLLinkElement | null;
     if (existing) existing.href = s.favicon_url;
   }
 }
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const { data, loading, refetch } = useApiQuery<any>("settings", "/settings");
+  const { t } = useTranslation();
+
+  const settings: Settings = React.useMemo(() => ({
+    site_name: "Mohamed Fisal",
+    site_title: "Mohamed Fisal — Senior Backend Engineer",
+    site_desc: t("home.hero.desc", "I build production-grade platforms using Laravel, Livewire, and React. Specialized in ERP/CRM modules, payments, wallets, webhooks, and multilingual dashboards."),
+    meta_keys: "Laravel, React, Backend, Engineer, Architect, Freelance",
+    meta_desc: t("home.hero.desc"),
+    logo_url: "",
+    favicon_url: "/vite.svg", // Add real favicon
+    email: "contact@mohamed-fisal.com",
+    phone: "+201000000000",
+    whatsapp: "+201000000000",
+    linkedin: "https://linkedin.com/in/mohamed-fisal",
+    github: "https://github.com/muuFisal",
+    footer_text: t("footer.rights", "All rights reserved."),
+    profile_image_url: "/avatar.jpg", // Needs an actual path
+    cv_url: "/resume.pdf",
+    headline: t("home.hero.title", "Mohamed Fisal — Build systems that scale."),
+    short_bio: t("home.hero.desc"),
+    years_experience: 7,
+    location: "Remote",
+    availability: "Available for freelance and consulting",
+  }), [t]);
 
   React.useEffect(() => {
-    if (data) applyHeadFromSettings(mapSettingsResponse(data));
-  }, [data]);
+    applyHeadFromSettings(settings);
+  }, [settings]);
 
   return (
-    <SettingsContext.Provider value={{ settings: data ? mapSettingsResponse(data) : null, loading, refetch }}>
+    <SettingsContext.Provider
+      value={{
+        settings,
+        loading: false,
+        refetch: () => { },
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );
@@ -100,5 +115,5 @@ export function useSettings() {
 }
 
 export function refreshSettings() {
-  clearApiCache("settings");
+  // Static state needs no refresh
 }

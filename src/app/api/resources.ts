@@ -1,4 +1,5 @@
-import { useApiQuery, useApiQuerySelect } from "./hooks";
+import { useTranslation } from "react-i18next";
+import { projects as localProjects } from "../../data/projects";
 
 export type Project = {
   id: number;
@@ -16,6 +17,7 @@ export type Project = {
     app_store?: string;
   };
   stack?: string[];
+  highlights?: string[];
 };
 
 export type Experience = {
@@ -65,80 +67,126 @@ export type Achievement = {
 };
 
 export function useProjects() {
-  return useApiQuery<Project[]>("projects", "/projects");
+  const { t } = useTranslation();
+
+  const data: Project[] = localProjects.map((p) => ({
+    id: Number(p.id.length),
+    slug: p.id,
+    title: t(p.titleKey),
+    summary: t(p.descKey),
+    description: t(p.descKey),
+    cover_image_url: p.image,
+    tags: [p.category],
+    featured: p.featured,
+    stack: p.stack,
+    links: {
+      web: p.links?.web,
+      google_play: p.links?.googlePlay,
+      app_store: p.links?.appStore,
+    },
+    highlights: p.highlightsKey.map(h => t(h)),
+  }));
+
+  return { data, loading: false, error: null, refetch: () => { } };
 }
 
 export function useProject(slug: string) {
-  const safe = String(slug);
-  return useApiQuery<Project>(`project:${safe}`, `/projects/${encodeURIComponent(safe)}`);
+  const { data } = useProjects();
+  const project = data.find((p) => p.slug === slug) || null;
+  return { data: project, loading: false, error: null, refetch: () => { } };
 }
 
 export function useExperiences() {
-  return useApiQuerySelect<any, Experience[]>("experiences", "/experiences", (raw) => {
-    const arr = (raw as any[]) || [];
-    return arr.map((e: any) => {
-      const highlights = Array.isArray(e.highlights) ? e.highlights : [];
-      const lang = (typeof window !== "undefined" && document?.documentElement?.dir === "rtl") ? "ar" : "en";
-      const desc = highlights
-        .map((h: any) => (typeof h === "string" ? h : (h?.[lang] ?? h?.en ?? h?.ar ?? "")))
-        .filter(Boolean)
-        .join(" • ");
-      return {
-        id: e.id,
-        title: e.role ?? e.title ?? "",
-        company: e.company ?? "",
-        location: e.location ?? "",
-        start_date: e.start_date,
-        end_date: e.end_date,
-        is_current: e.end_date == null,
-        description: e.description ?? desc,
-        tags: e.tags ?? [],
-      } as Experience;
-    });
-  });
+  const { t } = useTranslation();
+
+  const data: Experience[] = [
+    {
+      id: 1,
+      title: t("experience.roles.sr.title", "Senior Backend Engineer"),
+      company: "Freelance & Consulting",
+      location: t("experience.roles.sr.location", "Remote"),
+      start_date: "2020",
+      end_date: null,
+      is_current: true,
+      description: t("experience.roles.sr.desc", "Architected and delivered scalable ERP systems, Wallet payment gateways, and multilingual platforms. Specialized in Laravel, React, and seamless third-party integrations."),
+      tags: ["Laravel", "React", "Architecture", "Payments"],
+    },
+    {
+      id: 2,
+      title: t("experience.roles.mid.title", "Full-Stack Developer"),
+      company: "Various Tech Agencies",
+      location: "MENA Region",
+      start_date: "2017",
+      end_date: "2020",
+      is_current: false,
+      description: t("experience.roles.mid.desc", "Developed RESTful APIs, modern dynamic user interfaces, and custom dashboards ensuring robust data pipelines and fast deployment."),
+      tags: ["PHP", "Vue.js", "MySQL", "APIs"],
+    }
+  ];
+
+  return { data, loading: false, error: null, refetch: () => { } };
 }
 
 export function useEvents() {
-  return useApiQuery<EventItem[]>("events", "/events");
+  const { t } = useTranslation();
+
+  const data: EventItem[] = [
+    {
+      id: 1,
+      title: t("events.items.e1.title", "ERP Manufacturing modules delivery"),
+      description: t("events.items.e1.desc", "Completed core manufacturing modules with translations, logs, and advanced data tables."),
+      date: "2024",
+    },
+    {
+      id: 2,
+      title: t("events.items.e2.title", "Wallet payments + OPay integration"),
+      description: t("events.items.e2.desc", "Delivered end-to-end topup flow with webhook validation and unified callback view."),
+      date: "2023",
+    },
+    {
+      id: 3,
+      title: t("events.items.e3.title", "Market tickers engine shipped"),
+      description: t("events.items.e3.desc", "Built live-ish market tickers with fallback logic and ensureFresh updates."),
+      date: "2022",
+    }
+  ];
+
+  return { data, loading: false, error: null, refetch: () => { } };
 }
 
 export function useTestimonials() {
-  return useApiQuerySelect<any, Testimonial[]>("testimonials", "/testimonials", (raw) => {
-    const arr = Array.isArray(raw) ? raw : [];
-    return arr.map((t: any) => ({
-      id: t.id,
-      name: t.name ?? "",
-      badge: t.badge ?? "",
-      quote: t.quote ?? t.content ?? "",
-    }));
-  });
+  const { t } = useTranslation();
+
+  const data: Testimonial[] = [
+    {
+      id: 1,
+      name: t("testimonials.items.t1.name", "Project Manager"),
+      badge: t("testimonials.items.t1.role", "Client"),
+      quote: t("testimonials.items.t1.quote", "Delivers fast with strong architecture and clean code."),
+    },
+    {
+      id: 2,
+      name: t("testimonials.items.t2.name", "Team Lead"),
+      badge: t("testimonials.items.t2.role", "Tech"),
+      quote: t("testimonials.items.t2.quote", "Great at integrations, webhooks, and edge cases."),
+    },
+    {
+      id: 3,
+      name: t("testimonials.items.t3.name", "Founder"),
+      badge: t("testimonials.items.t3.role", "Startup"),
+      quote: t("testimonials.items.t3.quote", "Reliable execution, clear communication, and real business impact."),
+    }
+  ];
+
+  return { data, loading: false, error: null, refetch: () => { } };
 }
 
 export function useSkills() {
-  return useApiQuerySelect<any, Skill[]>("skills", "/skills", (raw) => {
-    const arr = Array.isArray(raw) ? raw : [];
-    return arr
-      .map((s: any) => ({
-        id: s.id,
-        title: s.title ?? "",
-        subtitle: s.subtitle ?? "",
-        percent: Number(s.percent ?? s.level ?? 0),
-        sort_order: s.sort_order,
-      }))
-      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-  });
+  const data: Skill[] = [];
+  return { data, loading: false, error: null, refetch: () => { } };
 }
 
 export function useAchievements() {
-  return useApiQuerySelect<any, Achievement[]>("achievements", "/achievements", (raw) => {
-    const arr = (raw as any[]) || [];
-    return arr.map((a: any) => ({
-      id: a.id,
-      title: a.title ?? "",
-      description: a.description ?? "",
-      value: a.value,
-      unit: a.unit,
-      icon: a.icon,
-    }));
-  });
+  const data: Achievement[] = [];
+  return { data, loading: false, error: null, refetch: () => { } };
 }
