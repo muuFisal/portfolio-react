@@ -8,17 +8,11 @@ import ExpertiseStrip from "../components/sections/home/ExpertiseStrip";
 import ProcessSection from "../components/sections/home/ProcessSection";
 import OpenSourceSpotlight from "../components/sections/home/OpenSourceSpotlight";
 import Seo from "../components/ui/Seo";
-import { useTranslation } from "react-i18next";
 
 export default function Home() {
-  const { t } = useTranslation();
   return (
     <>
-      <Seo
-        title={t("home.seoTitle", { defaultValue: "Mohamed Fisal | Senior Backend Engineer & Laravel Architect" })}
-        description={t("home.seoDesc", { defaultValue: "Senior Backend Engineer specialized in Laravel, React, ERP, CRM, payments, wallets, webhooks, and multilingual product systems." })}
-        canonicalPath="/"
-      />
+      <Seo pageKey="home" canonicalPath="/" />
       <Hero />
       <ExpertiseStrip />
       <Highlights />

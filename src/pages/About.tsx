@@ -1,115 +1,186 @@
-import Container from "../components/layout/Container";
-import MotionSection from "../components/ui/MotionSection";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Seo from "../components/ui/Seo";
+import { useAboutQuery, useProfileQuery } from "../app/api/resources";
 import { useSettings } from "../app/settings/context";
-import { getProfileData } from "../utils/profile";
-import { useTranslation } from "react-i18next";
+import Container from "../components/layout/Container";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import MotionSection from "../components/ui/MotionSection";
+import Seo from "../components/ui/Seo";
+import { getIconNode } from "../utils/icon-map";
 
 export default function About() {
+  const aboutQuery = useAboutQuery();
+  const profileQuery = useProfileQuery();
   const { settings } = useSettings();
-  const { t } = useTranslation();
-  const profile = getProfileData(settings);
 
-  const VALUES = [
-    {
-      title: t("about.v1.title", "Architecture that survives growth"),
-      desc: t("about.v1.desc", "I care about structure, separation of concerns, maintainability, and clean scaling paths from day one."),
-    },
-    {
-      title: t("about.v2.title", "Business-first execution"),
-      desc: t("about.v2.desc", "I translate requirements into systems that teams can actually operate, extend, and trust in production."),
-    },
-    {
-      title: t("about.v3.title", "Frontend awareness"),
-      desc: t("about.v3.desc", "Even as a backend-first engineer, I build polished interfaces with React when the product needs a stronger user experience."),
-    },
-    {
-      title: t("about.v4.title", "Production reliability"),
-      desc: t("about.v4.desc", "Payments, wallets, webhooks, queues, permissions, logs, and edge cases are all part of the job — not after thoughts."),
-    },
-  ];
+  const about = aboutQuery.data;
+  const profile = profileQuery.data;
+  const image =
+    about?.profile_image_url ||
+    profile?.profile_image_url ||
+    settings?.branding.profile_image_url ||
+    "";
+  const resumeUrl =
+    about?.resume_url || profile?.resume_url || settings?.branding.resume_url || "";
+  const focusAreas = about?.focus_areas.length
+    ? about.focus_areas
+    : profile?.focus_areas || [];
+  const metrics = about?.highlights.length
+    ? about.highlights
+    : [
+        {
+          id: 1,
+          title: "Years Experience",
+          description: profile?.headline || null,
+          icon: "briefcase",
+          value: profile?.years_experience || null,
+          unit: profile?.years_experience ? "+" : null,
+        },
+        {
+          id: 2,
+          title: "Projects Delivered",
+          description: profile?.short_bio || null,
+          icon: "chart",
+          value: profile?.projects_delivered || null,
+          unit: profile?.projects_delivered ? "+" : null,
+        },
+        {
+          id: 3,
+          title: "Clients",
+          description: profile?.availability_text || null,
+          icon: "handshake",
+          value: profile?.clients_count || null,
+          unit: profile?.clients_count ? "+" : null,
+        },
+      ];
 
   return (
     <>
       <Seo
-        title={`${profile.fullName} | About`}
-        description={profile.longBio}
+        pageKey="about"
+        title={about?.title ? `${profile?.full_name || settings?.site_name} | ${about.title}` : undefined}
+        description={about?.summary || about?.story || profile?.long_bio || undefined}
         canonicalPath="/about"
       />
       <MotionSection className="py-16 sm:py-20">
         <Container>
+          {aboutQuery.error ? (
+            <Card className="mb-6 p-6">
+              <div className="text-lg font-extrabold">Unable to load the about page</div>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                {aboutQuery.error.message}
+              </p>
+              <div className="mt-4">
+                <Button onClick={aboutQuery.refetch}>Retry</Button>
+              </div>
+            </Card>
+          ) : null}
+
           <div className="grid gap-8 lg:grid-cols-[0.8fr,1.2fr] lg:items-start">
             <Card className="overflow-hidden p-0">
               <div className="h-80 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10">
-                {profile.photoUrl ? (
-                  <img src={profile.photoUrl} alt={profile.fullName} className="h-full w-full object-cover" />
+                {image ? (
+                  <img
+                    src={image}
+                    alt={profile?.full_name || settings?.site_name || "Profile"}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full items-center justify-center text-7xl font-black text-slate-400 dark:text-slate-600">
-                    {profile.fullName.split(" ").slice(0, 2).map((w) => w[0]).join("")}
+                    {(profile?.full_name || settings?.site_name || "MF")
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((word) => word[0])
+                      .join("")}
                   </div>
                 )}
               </div>
               <div className="p-6">
-                <div className="text-2xl font-extrabold">{t("about.profile.fullName", profile.fullName)}</div>
+                <div className="text-2xl font-extrabold">
+                  {profile?.full_name || settings?.site_name || "Portfolio"}
+                </div>
                 <div className="mt-2 text-sm font-semibold text-slate-500 dark:text-slate-300">
-                  {t("about.profile.headline", profile.headline)}
+                  {profile?.headline || settings?.site_title}
                 </div>
                 <div className="mt-4 text-sm text-slate-600 dark:text-slate-300">
-                  {t("about.profile.location", profile.location)}
+                  {profile?.location || settings?.site_address}
                 </div>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {[
-                    t("about.profile.focus1", profile.primaryFocus[0] || "ERP / CRM Architecture"),
-                    t("about.profile.focus2", profile.primaryFocus[1] || "Laravel + Livewire Systems"),
-                    t("about.profile.focus3", profile.primaryFocus[2] || "React + TypeScript Frontends"),
-                    t("about.profile.focus4", profile.primaryFocus[3] || "Payments, Wallets & Webhooks"),
-                  ].filter(Boolean).map((item) => (
-                    <span key={item} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-extrabold dark:border-slate-800 dark:bg-slate-950">
-                      {item}
-                    </span>
-                  ))}
-                </div>
-                <a href={profile.cvUrl || "#"} target="_blank" rel="noreferrer" className="mt-6 inline-flex">
-                  <Button className="w-full">{t("about.downloadCv", { defaultValue: "Download CV" })}</Button>
-                </a>
+                {focusAreas.length ? (
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {focusAreas.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-extrabold dark:border-slate-800 dark:bg-slate-950"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                {resumeUrl ? (
+                  <a href={resumeUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex">
+                    <Button className="w-full">Download Resume</Button>
+                  </a>
+                ) : null}
               </div>
             </Card>
 
             <div>
               <div className="inline-flex rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-xs font-extrabold text-primary">
-                {t("about.badge", { defaultValue: "About Me" })}
+                {about?.subtitle || "About"}
               </div>
               <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
-                {t("about.title", { defaultValue: "A senior engineer focused on scalable products and reliable delivery." })}
+                {about?.title || profile?.headline || settings?.site_title}
               </h1>
-              <p className="mt-6 text-base leading-8 text-slate-600 dark:text-slate-300">{profile.longBio}</p>
-              <p className="mt-4 text-base leading-8 text-slate-600 dark:text-slate-300">
-                {t("about.extra", { defaultValue: "My work spans ERP, CRM, manufacturing, e-commerce, and fintech products. I enjoy turning complex workflows into maintainable systems with clear architecture, secure integrations, and practical user experiences." })}
-              </p>
+              {about?.summary ? (
+                <p className="mt-6 text-base leading-8 text-slate-600 dark:text-slate-300">
+                  {about.summary}
+                </p>
+              ) : null}
+              {about?.story || profile?.long_bio ? (
+                <p className="mt-4 text-base leading-8 text-slate-600 dark:text-slate-300">
+                  {about?.story || profile?.long_bio}
+                </p>
+              ) : null}
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                {[
-                  [profile.years, t("about.metrics.years", { defaultValue: "Years of experience" })],
-                  ["Laravel + React", t("about.metrics.stack", { defaultValue: "Main delivery stack" })],
-                  ["ERP • CRM • FinTech", t("about.metrics.domain", { defaultValue: "Domain depth" })],
-                ].map(([value, label]) => (
-                  <Card key={label} className="p-5">
-                    <div className="text-2xl font-extrabold">{value}</div>
-                    <div className="mt-2 text-sm text-slate-600 dark:text-slate-300">{label}</div>
+                {metrics.slice(0, 3).map((item) => (
+                  <Card key={item.id} className="p-5">
+                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      {getIconNode(item.icon)}
+                    </div>
+                    <div className="mt-4 text-2xl font-extrabold">
+                      {item.value != null ? `${item.value}${item.unit || ""}` : item.title}
+                    </div>
+                    <div className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                      {item.title}
+                    </div>
                   </Card>
                 ))}
               </div>
 
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
-                {VALUES.map((item) => (
-                  <Card key={item.title} className="p-6">
-                    <h3 className="text-lg font-extrabold">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">{item.desc}</p>
-                  </Card>
-                ))}
-              </div>
+              {about?.values.length ? (
+                <div className="mt-8 grid gap-4 md:grid-cols-2">
+                  {about.values.map((item) => (
+                    <Card key={item.title} className="p-6">
+                      <h3 className="text-lg font-extrabold">{item.title}</h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                        {item.description}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              ) : null}
+
+              {aboutQuery.loading && !about ? (
+                <div className="mt-8 grid gap-4 md:grid-cols-2">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <Card key={index} className="p-6">
+                      <div className="h-6 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                      <div className="mt-3 h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                    </Card>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
         </Container>

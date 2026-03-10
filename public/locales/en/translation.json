@@ -11,7 +11,9 @@
     "close": "Close",
     "loading": "Loading...",
     "error": "Something went wrong",
-    "retry": "Try again"
+    "retry": "Try again",
+    "required": "Required",
+    "optional": "Optional"
   },
   "footer": {
     "quick": "Quick Links",
@@ -139,7 +141,38 @@
     },
     "testimonials": {
       "title": "What people say",
-      "subtitle": "Short feedback that reflects collaboration and quality."
+      "subtitle": "Short feedback that reflects collaboration and quality.",
+      "loadError": "Unable to load testimonials",
+      "none": "No testimonials are available yet."
+    },
+    "comments": {
+      "ctaLabel": "Public Feedback",
+      "ctaTitle": "Leave a comment",
+      "ctaSubtitle": "Share a short note about the collaboration. The existing API submission flow stays unchanged, but the interaction is now lighter and more focused.",
+      "listLabel": "Community Notes",
+      "listTitle": "Public comments",
+      "listSubtitle": "Approved comments from visitors and collaborators, styled to match the testimonial cards.",
+      "none": "No public comments have been approved yet.",
+      "loadError": "Unable to load comments",
+      "toast": {
+        "title": "Comment submitted",
+        "body": "Thanks. Your comment was sent successfully and will appear after approval."
+      },
+      "modal": {
+        "title": "Leave a Comment",
+        "subtitle": "Share a short note about working together. Submissions are sent to the existing API and appear after approval.",
+        "role": "Role",
+        "rolePlaceholder": "Founder, designer, engineer",
+        "rating": "Rating",
+        "ratingPlaceholder": "Select a rating",
+        "comment": "Comment",
+        "commentPlaceholder": "Share your experience working together.",
+        "avatar": "Avatar",
+        "avatarPlaceholder": "Upload an optional image",
+        "fileHint": "PNG, JPG, or WebP up to 4MB",
+        "privacy": "Comments are reviewed before appearing publicly.",
+        "submit": "Submit Comment"
+      }
     },
     "cta": {
       "title": "Need a developer who can deliver?",
@@ -322,22 +355,51 @@
     "subtitle": "Let’s build something great. Tell me about your project and timeline.",
     "cards": {
       "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "availability": "Availability",
+      "officeHours": "Office Hours",
       "whatsapp": "WhatsApp",
       "linkedin": "LinkedIn",
       "github": "GitHub",
-      "hint": "Update these links with your real profiles."
+      "instagram": "Instagram",
+      "x": "X",
+      "socialsTitle": "Socials",
+      "socialsSubtitle": "Quick links for a lighter, more direct way to connect.",
+      "resume": "Open Resume",
+      "hint": "Update these links with your real profiles.",
+      "unavailable": "Contact details are not available yet.",
+      "loadError": "Unable to load contact details"
     },
     "form": {
+      "inquiryBadge": "Project Inquiry",
+      "inquiryTitle": "Tell me what you need built",
+      "inquirySubtitle": "Share the problem, scope, and timeline. The form still submits through the existing API flow.",
       "name": "Name",
       "email": "Email",
       "phone": "Phone",
+      "company": "Company",
+      "serviceInterest": "Service Interest",
+      "budgetRange": "Budget Range",
       "subject": "Subject",
       "message": "Message",
       "namePh": "Your name",
       "emailPh": "Your email",
+      "emailBusinessPh": "name@company.com",
       "phonePh": "Optional",
+      "phoneIntlPh": "+20 ...",
+      "companyPh": "Your company or team",
+      "serviceInterestPh": "API integration, dashboard, website",
+      "budgetRangeSelect": "Select a range",
+      "budgetRanges": {
+        "under1k": "Under $1k",
+        "from1kTo5k": "$1k - $5k",
+        "from5kTo10k": "$5k - $10k",
+        "over10k": "$10k+"
+      },
       "subjectPh": "Optional",
-      "msgPh": "Tell me what you want to build...",
+      "msgPh": "Tell me what you want to build, the timeline, and any constraints.",
+      "sending": "Sending...",
       "send": "Send message",
       "sent": "Message sent successfully. I’ll get back to you soon.",
       "note": "By sending this message, you agree that I can contact you back using the provided details."

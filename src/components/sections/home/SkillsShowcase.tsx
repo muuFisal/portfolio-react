@@ -1,125 +1,60 @@
-import SectionHeader from "../../ui/SectionHeader";
-import Container from "../../layout/Container";
-import SectionFX from "../../ui/SectionFX";
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { useSkills } from "../../../app/api/resources";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { useHomeSkillsShowcaseQuery, useSkillsQuery } from "../../../app/api/resources";
+import type { SkillItem } from "../../../app/api/types";
+import { getSkillPalette } from "../../../utils/skill-colors";
+import Container from "../../layout/Container";
+import Button from "../../ui/Button";
+import Card from "../../ui/Card";
+import SectionHeader from "../../ui/SectionHeader";
 
-type SkillItem = {
-  title: string;
-  percent: number;
-  subtitle?: string;
-  paletteIndex?: number;
-};
-
-
-const SKILL_PALETTE = [
-  {
-    "from": "#60A5FA",
-    "to": "#2563EB",
-    "text": "#1D4ED8",
-    "ring": "#60A5FA"
-  },
-  {
-    "from": "#34D399",
-    "to": "#059669",
-    "text": "#047857",
-    "ring": "#34D399"
-  },
-  {
-    "from": "#A78BFA",
-    "to": "#7C3AED",
-    "text": "#6D28D9",
-    "ring": "#A78BFA"
-  },
-  {
-    "from": "#FBBF24",
-    "to": "#D97706",
-    "text": "#B45309",
-    "ring": "#FBBF24"
-  },
-  {
-    "from": "#FB7185",
-    "to": "#E11D48",
-    "text": "#BE123C",
-    "ring": "#FB7185"
-  },
-  {
-    "from": "#22D3EE",
-    "to": "#0891B2",
-    "text": "#0E7490",
-    "ring": "#22D3EE"
-  },
-  {
-    "from": "#F472B6",
-    "to": "#DB2777",
-    "text": "#BE185D",
-    "ring": "#F472B6"
-  },
-  {
-    "from": "#4ADE80",
-    "to": "#16A34A",
-    "text": "#166534",
-    "ring": "#4ADE80"
-  },
-  {
-    "from": "#F97316",
-    "to": "#EA580C",
-    "text": "#C2410C",
-    "ring": "#F97316"
-  }
-] as const;
-const COLORS = ["sky", "emerald", "violet", "amber", "rose", "teal", "indigo", "lime", "fuchsia"];
-
-function clamp(n: number, a: number, b: number) {
-  return Math.max(a, Math.min(b, n));
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
 }
 
 function useCountUp(target: number, start: boolean, duration = 900) {
-  const [v, setV] = useState(0);
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
-    if (!start) return;
+    if (!start) {
+      return;
+    }
 
     let raf = 0;
-    const t0 = performance.now();
-    const to = clamp(target, 0, 100);
+    const startedAt = performance.now();
+    const finalValue = clamp(target, 0, 100);
 
-    const tick = (t: number) => {
-      const p = clamp((t - t0) / duration, 0, 1);
-      // easeOutCubic
-      const eased = 1 - Math.pow(1 - p, 3);
-      setV(Math.round(to * eased));
-      if (p < 1) raf = requestAnimationFrame(tick);
+    const tick = (now: number) => {
+      const progress = clamp((now - startedAt) / duration, 0, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(finalValue * eased));
+
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+      }
     };
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [target, start, duration]);
+  }, [duration, start, target]);
 
-  return v;
+  return value;
 }
 
-function Bar({ item, delay }: { item: SkillItem; delay: number }) {
+function SkillBar({ item, delay }: { item: SkillItem; delay: number }) {
   const [start, setStart] = useState(false);
   const value = useCountUp(item.percent, start, 950);
-
-  const p = SKILL_PALETTE[item.paletteIndex ?? 0] ?? SKILL_PALETTE[0];
+  const palette = getSkillPalette(item);
 
   const fillStyle: CSSProperties = {
-    background: `linear-gradient(90deg, ${p.from}, ${p.to})`,
-  };
-
-  const glowStyle: CSSProperties = {
-    background: `linear-gradient(90deg, ${p.from}, ${p.to})`,
+    background: `linear-gradient(90deg, ${palette.from}, ${palette.to})`,
   };
 
   const badgeStyle: CSSProperties = {
-    borderColor: p.ring + "55",
-    color: p.text,
-    background: p.ring + "14",
+    borderColor: `${palette.ring}55`,
+    color: palette.text,
+    background: `${palette.ring}14`,
   };
 
   return (
@@ -141,20 +76,22 @@ function Bar({ item, delay }: { item: SkillItem; delay: number }) {
               {item.subtitle}
             </div>
           ) : null}
+          {item.category ? (
+            <div className="mt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
+              {item.category}
+            </div>
+          ) : null}
         </div>
 
         <span
-          className={[
-            "relative inline-flex items-center rounded-full border px-3 py-1 text-xs font-extrabold",
-            "bg-white/80 dark:bg-slate-950/40",
-            badgeStyle,
-          ].join(" ")}
+          className="relative inline-flex items-center rounded-full border px-3 py-1 text-xs font-extrabold"
+          style={badgeStyle}
         >
           <span className="tabular-nums">{value}%</span>
         </span>
       </div>
 
-      <div className="mt-4 relative">
+      <div className="relative mt-4">
         <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
           <motion.div
             className="relative h-full rounded-full"
@@ -162,13 +99,9 @@ function Bar({ item, delay }: { item: SkillItem; delay: number }) {
             initial={{ width: "0%" }}
             animate={{ width: `${value}%` }}
             transition={{ type: "spring", stiffness: 120, damping: 18 }}
-          >
-            <div className="absolute inset-0 opacity-70 blur-xl"
-              style={glowStyle} />
-          </motion.div>
+          />
         </div>
 
-        {/* moving shine */}
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 start-0 w-24 rounded-full bg-white/40 blur-md dark:bg-white/10"
@@ -182,123 +115,109 @@ function Bar({ item, delay }: { item: SkillItem; delay: number }) {
 }
 
 export default function SkillsShowcase() {
-  const { t } = useTranslation();
+  const showcaseQuery = useHomeSkillsShowcaseQuery();
+  const skillsQuery = useSkillsQuery();
 
-  const { data: apiSkills } = useSkills();
+  const items = useMemo(() => {
+    if (showcaseQuery.data?.items.length) {
+      return showcaseQuery.data.items;
+    }
 
-  const groups = useMemo(() => {
-    // fallback (in case API is empty)
-    const fallback: SkillItem[] = [
-      { title: t("skills.backend.s1t"), percent: 95, subtitle: t("skills.backend.s1d") },
-      { title: t("skills.frontend.s1t"), percent: 85, subtitle: t("skills.frontend.s1d") },
-      { title: t("skills.systems.s1t"), percent: 90, subtitle: t("skills.systems.s1d") },
-      { title: t("skills.backend.s2t"), percent: 92, subtitle: t("skills.backend.s2d") },
-      { title: t("skills.frontend.s2t"), percent: 80, subtitle: t("skills.frontend.s2d") },
-      { title: t("skills.systems.s2t"), percent: 88, subtitle: t("skills.systems.s2d") },
-      { title: t("skills.backend.s3t"), percent: 90, subtitle: t("skills.backend.s3d") },
-      { title: t("skills.frontend.s3t"), percent: 88, subtitle: t("skills.frontend.s3d") },
-      { title: t("skills.systems.s3t"), percent: 87, subtitle: t("skills.systems.s3d") },
-      { title: t("skills.backend.s4t"), percent: 88, subtitle: t("skills.backend.s4d") },
-      { title: t("skills.frontend.s4t"), percent: 90, subtitle: t("skills.frontend.s4d") },
-      { title: t("skills.systems.s4t"), percent: 86, subtitle: t("skills.systems.s4d") },
-    ];
+    return (skillsQuery.data?.items || []).filter((skill) => skill.featured).slice(0, 12);
+  }, [showcaseQuery.data?.items, skillsQuery.data?.items]);
 
-    const base: SkillItem[] = (apiSkills?.length ? apiSkills : fallback).map((s, idx) => ({
-      title: s.title,
-      subtitle: s.subtitle,
-      percent: s.percent,
-      paletteIndex: idx % SKILL_PALETTE.length,
-    }));
-
-    const col1: SkillItem[] = [];
-    const col2: SkillItem[] = [];
-    const col3: SkillItem[] = [];
-
-    base.forEach((it, idx) => {
-      if (idx % 3 === 0) col1.push(it);
-      else if (idx % 3 === 1) col2.push(it);
-      else col3.push(it);
+  const columns = useMemo(() => {
+    const output = [[], [], []] as SkillItem[][];
+    items.forEach((item, index) => {
+      output[index % 3].push(item);
     });
-
-    return { col1, col2, col3 };
-  }, [t, apiSkills]);
+    return output;
+  }, [items]);
 
   const chips = useMemo(() => {
-    const fromApi = (apiSkills || [])
-      .map((s) => s.title)
-      .filter((x) => !!x && String(x).trim() !== "")
-      .slice(0, 20);
-
-    return fromApi.length
-      ? fromApi
-      : [
-          "Spatie i18n",
-          "Meta API",
-          "OPay",
-          "Payments",
-          "Webhooks",
-          "Queues",
-          "Redis",
-          "MySQL",
-          "Tailwind",
-          "TypeScript",
-          "React",
-          "Livewire",
-          "Laravel",
-          "IIS / Nginx",
-          "Docker (Basics)",
-          "Audit Logs",
-        ];
-  }, [apiSkills]);
+    return (skillsQuery.data?.items || [])
+      .map((skill) => skill.title)
+      .filter(Boolean)
+      .slice(0, 18);
+  }, [skillsQuery.data?.items]);
 
   return (
     <section className="relative py-14">
       <Container>
-        <SectionHeader title={t("skills.title")} subtitle={t("skills.subtitle")} />
+        <SectionHeader
+          title={showcaseQuery.data?.title || "Skills Showcase"}
+          subtitle={
+            showcaseQuery.data?.subtitle ||
+            showcaseQuery.data?.description ||
+            "Core strengths used repeatedly in production."
+          }
+        />
+
+        {showcaseQuery.error ? (
+          <Card className="mb-5 p-5">
+            <div className="font-extrabold">Unable to load skills showcase</div>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              {showcaseQuery.error.message}
+            </p>
+            <div className="mt-4">
+              <Button onClick={showcaseQuery.refetch} variant="secondary">
+                Retry
+              </Button>
+            </div>
+          </Card>
+        ) : null}
 
         <div className="mt-8 grid gap-5 lg:grid-cols-3">
-          <div className="space-y-4">
-            {groups.col1.map((it, idx) => (
-              <Bar key={`${it.title}-${idx}`} item={it} delay={0.05 * idx} />
-            ))}
-          </div>
-
-          <div className="space-y-4">
-            {groups.col2.map((it, idx) => (
-              <Bar key={`${it.title}-${idx}`} item={it} delay={0.05 * idx} />
-            ))}
-          </div>
-
-          <div className="space-y-4">
-            {groups.col3.map((it, idx) => (
-              <Bar key={`${it.title}-${idx}`} item={it} delay={0.05 * idx} />
-            ))}
-          </div>
+          {(showcaseQuery.loading && !items.length ? [0, 1, 2] : columns).map((column, columnIndex) => (
+            <div key={columnIndex} className="space-y-4">
+              {Array.isArray(column) && column.length
+                ? column.map((item, index) => (
+                    <SkillBar key={item.id} item={item} delay={0.05 * index} />
+                  ))
+                : showcaseQuery.loading
+                ? Array.from({ length: 4 }).map((_, index) => (
+                    <Card key={index} className="p-5">
+                      <div className="h-5 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-slate-800" />
+                      <div className="mt-3 h-2.5 w-full animate-pulse rounded-full bg-slate-200 dark:bg-slate-800" />
+                    </Card>
+                  ))
+                : null}
+            </div>
+          ))}
         </div>
+
+        {!showcaseQuery.loading && !items.length && !showcaseQuery.error ? (
+          <Card className="mt-5 p-5 text-sm text-slate-600 dark:text-slate-300">
+            Skills showcase data is not available yet.
+          </Card>
+        ) : null}
 
         <div className="mt-10 rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-soft backdrop-blur dark:border-slate-800 dark:bg-slate-900/40">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <div className="text-lg font-extrabold text-slate-900 dark:text-white">
-                {t("skills.tools.title")}
+                {skillsQuery.data?.summary.total_items
+                  ? `${skillsQuery.data.summary.total_items} Skills`
+                  : "Tools & Stack"}
               </div>
               <div className="text-sm text-slate-600 dark:text-slate-300">
-                {t("skills.tools.subtitle")}
+                {showcaseQuery.data?.content.description ||
+                  "Skills and tools I reach for repeatedly in production work."}
               </div>
             </div>
             <div className="text-xs font-semibold text-slate-500 dark:text-slate-300">
-              {t("skills.tools.hint")}
+              API-backed and language-aware
             </div>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            {chips.map((chip, i) => (
+            {chips.map((chip, index) => (
               <motion.span
-                key={chip}
+                key={`${chip}-${index}`}
                 initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.65 }}
-                transition={{ duration: 0.35, delay: 0.02 * i }}
+                transition={{ duration: 0.35, delay: 0.02 * index }}
                 whileHover={{ y: -2 }}
                 className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-950/30 dark:text-slate-200"
               >

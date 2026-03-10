@@ -1,116 +1,137 @@
 import i18n from "../../i18n";
+import type { ApiEnvelope, ApiError, Locale } from "./types";
 
-type ApiEnvelope<T> = {
-  code: number;
-  message?: string;
-  data: T;
-  pagination?: {
-    page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-  };
-};
-
-export type ApiError = {
-  status: number;
-  message: string;
-  details?: unknown;
-};
-
-function cleanBase(base: string) {
-  return base.replace(/\/$/, "");
-}
-
-function joinUrl(base: string, path: string) {
-  const b = cleanBase(base);
-  const p = path.startsWith("/") ? path : `/${path}`;
-  return `${b}${p}`;
-}
-
-/**
- * Defaults:
- * - VITE_API_BASE_URL: https://dashboard.mohamed-fisal.com
- * - VITE_API_PREFIX: /api
- *
- * Final URL: {base}{prefix}{path}
- * With a fallback: if base+prefix returns 404, retry base+path.
- */
-const DEFAULT_BASE = "https://dashboard.mohamed-fisal.com";
-const BASE_URL = cleanBase(import.meta.env.VITE_API_BASE_URL || DEFAULT_BASE);
-const PREFIX = (import.meta.env.VITE_API_PREFIX || "/api").replace(/\/$/, "");
+type QueryValue = string | number | boolean | null | undefined;
 
 export type RequestOptions = {
   method?: "GET" | "POST";
   headers?: Record<string, string>;
-  body?: any;
+  body?: BodyInit | FormData | Record<string, unknown> | null;
+  query?: Record<string, QueryValue>;
   signal?: AbortSignal;
 };
 
-export async function apiRequest<T>(path: string, opts: RequestOptions = {}) {
-  const lang = (i18n.language || "en").startsWith("ar") ? "ar" : "en";
+function trimTrailingSlashes(value: string) {
+  return value.replace(/\/+$/, "");
+}
 
-  const headers: Record<string, string> = {
-    Accept: "application/json",
-    "Accept-Language": lang,
-    ...(opts.headers || {}),
-  };
+function trimLeadingSlashes(value: string) {
+  return value.replace(/^\/+/, "");
+}
 
-  const init: RequestInit = {
-    method: opts.method || "GET",
-    headers,
-    signal: opts.signal,
-  };
+function normalizeLocale(value?: string): Locale {
+  return value?.startsWith("ar") ? "ar" : "en";
+}
 
-  if (opts.body != null) {
-    // If FormData, let the browser set content-type boundaries
-    if (typeof FormData !== "undefined" && opts.body instanceof FormData) {
-      init.body = opts.body;
-    } else {
-      headers["Content-Type"] = "application/json";
-      init.body = JSON.stringify(opts.body);
+function getBaseUrl() {
+  const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  return trimTrailingSlashes(envBase || window.location.origin);
+}
+
+function getApiPrefix() {
+  const envPrefix = import.meta.env.VITE_API_PREFIX as string | undefined;
+  const prefix = envPrefix || "/api/v1/portfolio";
+  return `/${trimLeadingSlashes(trimTrailingSlashes(prefix))}`;
+}
+
+function buildSearchParams(query?: Record<string, QueryValue>) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(query || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") {
+      return;
     }
+    searchParams.set(key, String(value));
+  });
+
+  const search = searchParams.toString();
+  return search ? `?${search}` : "";
+}
+
+function composeUrl(path: string, query?: Record<string, QueryValue>) {
+  const normalizedPath = trimLeadingSlashes(path);
+  const url = `${getBaseUrl()}${getApiPrefix()}/${normalizedPath}`;
+  return `${url}${buildSearchParams(query)}`;
+}
+
+function isFormData(body: RequestOptions["body"]): body is FormData {
+  return typeof FormData !== "undefined" && body instanceof FormData;
+}
+
+async function parseJson(response: Response) {
+  const rawText = await response.text();
+
+  if (!rawText) {
+    return null;
   }
-
-  const urlWithPrefix = joinUrl(BASE_URL, `${PREFIX}${path.startsWith("/") ? path : `/${path}`}`);
-  const urlNoPrefix = joinUrl(BASE_URL, path);
-
-  const tryFetch = async (url: string) => {
-    const res = await fetch(url, init);
-    const text = await res.text();
-    let json: any = null;
-    try {
-      json = text ? JSON.parse(text) : null;
-    } catch {
-      json = null;
-    }
-
-    if (!res.ok) {
-      const msg =
-        (json && (json.message || json.error || json?.data?.message)) ||
-        res.statusText ||
-        "Request failed";
-      const err: ApiError = { status: res.status, message: msg, details: json };
-      throw err;
-    }
-
-    // Backend envelope {code, message, data, pagination}
-    const envelope = json as ApiEnvelope<T> | null;
-    if (envelope && typeof envelope === "object" && "data" in envelope) {
-      return envelope;
-    }
-
-    // Fallback (in case API returns raw)
-    return { code: res.status, data: json as T } as ApiEnvelope<T>;
-  };
 
   try {
-    return await tryFetch(urlWithPrefix);
-  } catch (e: any) {
-    // If /api prefix is wrong, retry without it on 404.
-    if (e?.status === 404) {
-      return await tryFetch(urlNoPrefix);
-    }
-    throw e;
+    return JSON.parse(rawText);
+  } catch {
+    return null;
   }
+}
+
+function normalizeError(response: Response, payload: any): ApiError {
+  return {
+    status: response.status,
+    code: typeof payload?.code === "number" ? payload.code : undefined,
+    message:
+      payload?.message ||
+      payload?.error ||
+      response.statusText ||
+      "Request failed",
+    details: payload,
+    validation:
+      typeof payload?.errors === "object" && payload?.errors
+        ? payload.errors
+        : undefined,
+  };
+}
+
+export function getCurrentLocale() {
+  return normalizeLocale(i18n.resolvedLanguage || i18n.language);
+}
+
+export async function apiRequest<T>(path: string, options: RequestOptions = {}) {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Accept-Language": getCurrentLocale(),
+    ...options.headers,
+  };
+
+  const requestInit: RequestInit = {
+    method: options.method || "GET",
+    headers,
+    signal: options.signal,
+  };
+
+  if (options.body != null) {
+    if (isFormData(options.body)) {
+      requestInit.body = options.body;
+    } else if (typeof options.body === "string" || options.body instanceof Blob) {
+      requestInit.body = options.body;
+    } else {
+      headers["Content-Type"] = "application/json";
+      requestInit.body = JSON.stringify(options.body);
+    }
+  }
+
+  const response = await fetch(composeUrl(path, options.query), requestInit);
+  const payload = await parseJson(response);
+
+  if (!response.ok) {
+    throw normalizeError(response, payload);
+  }
+
+  if (payload && typeof payload === "object" && "data" in payload) {
+    return payload as ApiEnvelope<T>;
+  }
+
+  return {
+    code: response.status,
+    message: response.statusText || "OK",
+    data: payload as T,
+    pagination: null,
+  } satisfies ApiEnvelope<T>;
 }

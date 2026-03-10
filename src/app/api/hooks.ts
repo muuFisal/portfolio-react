@@ -1,92 +1,233 @@
 import React from "react";
-import { apiRequest, type ApiError } from "./client";
+import { useTranslation } from "react-i18next";
+import { getCurrentLocale } from "./client";
 import { useApiLoading } from "./loading";
+import type { ApiEnvelope, ApiError, ApiPagination } from "./types";
+
+type QueryKey = string | readonly unknown[];
+
+type QueryOptions = {
+  enabled?: boolean;
+  keepPreviousData?: boolean;
+  trackLoading?: boolean;
+};
 
 type QueryState<T> = {
   data: T | null;
-  pagination?: {
-    page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-  };
+  pagination: ApiPagination | null;
   loading: boolean;
   error: ApiError | null;
   refetch: () => void;
 };
 
-const CACHE = new Map<string, any>();
+type MutationOptions = {
+  trackLoading?: boolean;
+};
 
-export function useApiQuery<T>(key: string, path: string) {
-  const { start, stop } = useApiLoading();
-  const [tick, setTick] = React.useState(0);
-  const [state, setState] = React.useState<Omit<QueryState<T>, "refetch">>(() => {
-    if (CACHE.has(key)) {
-      return { ...CACHE.get(key), loading: false, error: null };
-    }
-    return { data: null, loading: true, error: null };
-  });
+type MutationState<TData, TVariables> = {
+  data: TData | null;
+  loading: boolean;
+  error: ApiError | null;
+  mutateAsync: (variables: TVariables) => Promise<TData>;
+  reset: () => void;
+};
 
-  const refetch = React.useCallback(() => {
-    CACHE.delete(key);
-    setTick((t) => t + 1);
-  }, [key]);
+type CachedValue<T> = {
+  data: T;
+  pagination: ApiPagination | null;
+};
 
-  React.useEffect(() => {
-    let mounted = true;
-    const controller = new AbortController();
+const CACHE = new Map<string, CachedValue<unknown>>();
 
-    const run = async () => {
-      // if cached, don't refetch unless asked
-      if (CACHE.has(key)) {
-        const cached = CACHE.get(key);
-        if (mounted) setState({ ...cached, loading: false, error: null });
-        return;
-      }
-
-      if (mounted) setState((s) => ({ ...s, loading: true, error: null }));
-      start();
-      try {
-        const res = await apiRequest<T>(path, { signal: controller.signal });
-        const next = { data: res.data, pagination: res.pagination };
-        CACHE.set(key, next);
-        if (mounted) setState({ ...next, loading: false, error: null });
-      } catch (e: any) {
-        if (!mounted) return;
-        if (e?.name === "AbortError") return;
-        setState((s) => ({ ...s, loading: false, error: e as ApiError }));
-      } finally {
-        stop();
-      }
-    };
-
-    run();
-    return () => {
-      mounted = false;
-      controller.abort();
-    };
-  }, [key, path, tick, start, stop]);
-
-  return { ...state, refetch } as QueryState<T>;
+function serializeKey(key: QueryKey, locale: string) {
+  return JSON.stringify([locale, key]);
 }
 
-export function clearApiCache(prefixKey?: string) {
-  if (!prefixKey) {
+export function clearApiCache(prefix?: string) {
+  if (!prefix) {
     CACHE.clear();
     return;
   }
-  for (const k of Array.from(CACHE.keys())) {
-    if (k.startsWith(prefixKey)) CACHE.delete(k);
-  }
+
+  Array.from(CACHE.keys()).forEach((cacheKey) => {
+    if (cacheKey.includes(prefix)) {
+      CACHE.delete(cacheKey);
+    }
+  });
 }
 
-export async function apiPost<T>(path: string, body: any) {
-  return apiRequest<T>(path, { method: "POST", body });
+export function useApiQuery<T>(
+  key: QueryKey,
+  fetcher: (signal: AbortSignal) => Promise<ApiEnvelope<T>>,
+  options: QueryOptions = {}
+) {
+  const { i18n } = useTranslation();
+  const { start, stop } = useApiLoading();
+  const [tick, setTick] = React.useState(0);
+  const locale = React.useMemo(
+    () => getCurrentLocale(),
+    [i18n.resolvedLanguage, i18n.language]
+  );
+  const cacheKey = React.useMemo(() => serializeKey(key, locale), [key, locale]);
+  const fetcherRef = React.useRef(fetcher);
+
+  React.useEffect(() => {
+    fetcherRef.current = fetcher;
+  }, [fetcher]);
+
+  const [state, setState] = React.useState<Omit<QueryState<T>, "refetch">>(() => {
+    const cached = CACHE.get(cacheKey) as CachedValue<T> | undefined;
+    if (cached) {
+      return {
+        data: cached.data,
+        pagination: cached.pagination,
+        loading: false,
+        error: null,
+      };
+    }
+    return {
+      data: null,
+      pagination: null,
+      loading: Boolean(options.enabled ?? true),
+      error: null,
+    };
+  });
+
+  const refetch = React.useCallback(() => {
+    CACHE.delete(cacheKey);
+    setTick((value) => value + 1);
+  }, [cacheKey]);
+
+  React.useEffect(() => {
+    if (options.enabled === false) {
+      setState((current) => ({ ...current, loading: false }));
+      return;
+    }
+
+    let active = true;
+    const controller = new AbortController();
+    const cached = CACHE.get(cacheKey) as CachedValue<T> | undefined;
+
+    if (cached) {
+      setState({
+        data: cached.data,
+        pagination: cached.pagination,
+        loading: false,
+        error: null,
+      });
+      return () => {
+        active = false;
+        controller.abort();
+      };
+    }
+
+    setState((current) => ({
+      data: options.keepPreviousData ? current.data : null,
+      pagination: options.keepPreviousData ? current.pagination : null,
+      loading: true,
+      error: null,
+    }));
+
+    if (options.trackLoading) {
+      start();
+    }
+
+    fetcherRef.current(controller.signal)
+      .then((response) => {
+        if (!active) {
+          return;
+        }
+        const nextState = {
+          data: response.data,
+          pagination: response.pagination,
+        };
+        CACHE.set(cacheKey, nextState);
+        setState({
+          ...nextState,
+          loading: false,
+          error: null,
+        });
+      })
+      .catch((error: ApiError & { name?: string }) => {
+        if (!active || error?.name === "AbortError") {
+          return;
+        }
+        setState((current) => ({
+          ...current,
+          loading: false,
+          error,
+        }));
+      })
+      .finally(() => {
+        if (options.trackLoading) {
+          stop();
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [
+    cacheKey,
+    options.enabled,
+    options.keepPreviousData,
+    options.trackLoading,
+    start,
+    stop,
+    tick,
+  ]);
+
+  return { ...state, refetch } satisfies QueryState<T>;
 }
 
+export function useApiMutation<TData, TVariables>(
+  mutate: (variables: TVariables) => Promise<ApiEnvelope<TData>>,
+  options: MutationOptions = {}
+) {
+  const { start, stop } = useApiLoading();
+  const [data, setData] = React.useState<TData | null>(null);
+  const [error, setError] = React.useState<ApiError | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
-export function useApiQuerySelect<T, R>(key: string, path: string, select: (data: T) => R) {
-  const q = useApiQuery<T>(key, path);
-  const selected = React.useMemo(() => (q.data ? select(q.data) : null), [q.data]);
-  return { ...q, data: selected } as Omit<typeof q, 'data'> & { data: R | null };
+  const mutateAsync = React.useCallback(
+    async (variables: TVariables) => {
+      setLoading(true);
+      setError(null);
+
+      if (options.trackLoading) {
+        start();
+      }
+
+      try {
+        const response = await mutate(variables);
+        setData(response.data);
+        return response.data;
+      } catch (mutationError) {
+        const apiError = mutationError as ApiError;
+        setError(apiError);
+        throw apiError;
+      } finally {
+        setLoading(false);
+        if (options.trackLoading) {
+          stop();
+        }
+      }
+    },
+    [mutate, options.trackLoading, start, stop]
+  );
+
+  const reset = React.useCallback(() => {
+    setData(null);
+    setError(null);
+    setLoading(false);
+  }, []);
+
+  return {
+    data,
+    loading,
+    error,
+    mutateAsync,
+    reset,
+  } satisfies MutationState<TData, TVariables>;
 }

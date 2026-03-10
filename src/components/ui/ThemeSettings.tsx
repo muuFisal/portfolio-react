@@ -1,6 +1,7 @@
 import { useContext, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { FaCog } from "react-icons/fa";
 import { AppContext } from "../../app/providers";
 import { COLOR_PRESETS, FONT_OPTIONS } from "../../theme/theme";
 
@@ -34,19 +35,19 @@ function Swatch({
 }
 
 export default function ThemeSettings() {
-  const ctx = useContext(AppContext);
+  const context = useContext(AppContext);
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  if (!ctx) return null;
+  if (!context) {
+    return null;
+  }
 
-  const { brand, setPrimary, setSecondary, setFont, resetBrand } = ctx;
-
+  const { brand, setPrimary, setSecondary, setFont, resetBrand } = context;
   const presets = useMemo(() => COLOR_PRESETS, []);
 
   return (
     <>
-      {/* Floating button */}
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -54,7 +55,7 @@ export default function ThemeSettings() {
         aria-label="settings"
         title="Theme settings"
       >
-        ⚙️
+        <FaCog />
       </button>
 
       <AnimatePresence>
@@ -82,10 +83,11 @@ export default function ThemeSettings() {
                   {t("themeSettings.title")}
                 </div>
                 <button
+                  type="button"
                   onClick={() => setOpen(false)}
                   className="rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/30 dark:text-slate-200 dark:hover:bg-slate-900/60"
                 >
-                  ✕
+                  Close
                 </button>
               </div>
 
@@ -95,12 +97,12 @@ export default function ThemeSettings() {
                     {t("themeSettings.primary")}
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {presets.map((p) => (
+                    {presets.map((preset) => (
                       <Swatch
-                        key={"p-" + p.key}
-                        color={p.primary}
-                        active={brand.primary.toLowerCase() === p.primary.toLowerCase()}
-                        onClick={() => setPrimary(p.primary)}
+                        key={`p-${preset.key}`}
+                        color={preset.primary}
+                        active={brand.primary.toLowerCase() === preset.primary.toLowerCase()}
+                        onClick={() => setPrimary(preset.primary)}
                       />
                     ))}
                   </div>
@@ -111,12 +113,12 @@ export default function ThemeSettings() {
                     {t("themeSettings.secondary")}
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {presets.map((p) => (
+                    {presets.map((preset) => (
                       <Swatch
-                        key={"s-" + p.key}
-                        color={p.secondary}
-                        active={brand.secondary.toLowerCase() === p.secondary.toLowerCase()}
-                        onClick={() => setSecondary(p.secondary)}
+                        key={`s-${preset.key}`}
+                        color={preset.secondary}
+                        active={brand.secondary.toLowerCase() === preset.secondary.toLowerCase()}
+                        onClick={() => setSecondary(preset.secondary)}
                       />
                     ))}
                   </div>
@@ -127,23 +129,25 @@ export default function ThemeSettings() {
                     {t("themeSettings.font")}
                   </div>
                   <div className="mt-2 grid gap-2">
-                    {FONT_OPTIONS.map((f) => {
-                      const active = brand.font === f.name;
+                    {FONT_OPTIONS.map((font) => {
+                      const active = brand.font === font.name;
                       return (
                         <button
-                          key={f.key}
+                          key={font.key}
                           type="button"
-                          onClick={() => setFont(f.name)}
+                          onClick={() => setFont(font.name)}
                           className={[
                             "flex items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition",
                             active
                               ? "border-primary bg-primary/10 text-slate-900 dark:text-white"
                               : "border-slate-200 bg-white/60 text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/30 dark:text-slate-200 dark:hover:bg-slate-900/60",
                           ].join(" ")}
-                          style={{ fontFamily: `"${f.name}", var(--font-sans)` }}
+                          style={{ fontFamily: `"${font.name}", var(--font-sans)` }}
                         >
-                          <span>{f.name}</span>
-                          {active ? <span className="text-primary">●</span> : <span className="text-slate-400">○</span>}
+                          <span>{font.name}</span>
+                          <span className={active ? "text-primary" : "text-slate-400"}>
+                            {active ? "Active" : "Select"}
+                          </span>
                         </button>
                       );
                     })}

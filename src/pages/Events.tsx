@@ -1,16 +1,21 @@
 import Container from "../components/layout/Container";
-import SectionHeader from "../components/ui/SectionHeader";
 import EventsList from "../components/sections/events/EventsList";
-import { useTranslation } from "react-i18next";
+import SectionHeader from "../components/ui/SectionHeader";
+import Seo from "../components/ui/Seo";
 
 export default function Events() {
-  const { t } = useTranslation();
   return (
-    <div className="py-10">
-      <Container>
-        <SectionHeader title={t("events.title")} subtitle={t("events.subtitle")} />
-        <EventsList />
-      </Container>
-    </div>
+    <>
+      <Seo pageKey="events" canonicalPath="/events" />
+      <div className="py-16 sm:py-20">
+        <Container>
+          <SectionHeader
+            title="Events & Milestones"
+            subtitle="Releases, launches, and public milestones pulled directly from the API."
+          />
+          <EventsList />
+        </Container>
+      </div>
+    </>
   );
 }

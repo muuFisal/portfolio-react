@@ -1,22 +1,33 @@
+import { useExperiencesQuery } from "../app/api/resources";
 import Container from "../components/layout/Container";
-import SectionHeader from "../components/ui/SectionHeader";
 import Timeline from "../components/sections/experience/Timeline";
 import SkillsMatrix from "../components/sections/experience/SkillsMatrix";
-import { useTranslation } from "react-i18next";
-import { useExperiences } from "../app/api/resources";
+import SectionHeader from "../components/ui/SectionHeader";
+import Seo from "../components/ui/Seo";
 
 export default function Experience() {
-  const { t } = useTranslation();
-  const { data, loading, error, refetch } = useExperiences();
+  const { data, loading, error, refetch } = useExperiencesQuery();
+
   return (
-    <div className="py-10">
-      <Container>
-        <SectionHeader title={t("experience.title")} subtitle={t("experience.subtitle")} />
-        <div className="grid gap-8 lg:grid-cols-2">
-        <Timeline experiences={data || []} loading={loading} error={error} onRetry={refetch} />
-          <SkillsMatrix />
-        </div>
-      </Container>
-    </div>
+    <>
+      <Seo pageKey="experience" canonicalPath="/experience" />
+      <div className="py-16 sm:py-20">
+        <Container>
+          <SectionHeader
+            title="Experience"
+            subtitle="Career history, responsibilities, and the skills behind the shipped work."
+          />
+          <div className="grid gap-8 lg:grid-cols-2">
+            <Timeline
+              experiences={data?.items || []}
+              loading={loading}
+              error={error}
+              onRetry={refetch}
+            />
+            <SkillsMatrix />
+          </div>
+        </Container>
+      </div>
+    </>
   );
 }

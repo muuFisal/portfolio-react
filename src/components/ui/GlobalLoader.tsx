@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useApiLoading } from "../../app/api/loading";
 
 export default function GlobalLoader() {
@@ -16,7 +16,6 @@ export default function GlobalLoader() {
           exit={{ opacity: 0 }}
         >
           <div className="flex flex-col items-center gap-4">
-            {/* Spinner */}
             <motion.div
               aria-label="Loading"
               className="relative h-16 w-16"
@@ -28,21 +27,20 @@ export default function GlobalLoader() {
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary/90" />
             </motion.div>
 
-            {/* Dots */}
             <div className="flex items-center gap-1">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2].map((index) => (
                 <motion.span
-                  key={i}
+                  key={index}
                   className="h-2 w-2 rounded-full bg-slate-900/70 dark:bg-white/70"
                   initial={{ opacity: 0.2, y: 0 }}
                   animate={{ opacity: [0.2, 1, 0.2], y: [0, -4, 0] }}
-                  transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12 }}
+                  transition={{ duration: 0.9, repeat: Infinity, delay: index * 0.12 }}
                 />
               ))}
             </div>
 
             <div className="text-sm font-extrabold text-slate-700 dark:text-slate-200">
-              Loading…
+              Loading...
             </div>
           </div>
         </motion.div>
